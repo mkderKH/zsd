@@ -1,6 +1,6 @@
 import { ThirdwebProvider } from "thirdweb/react";
-// const inter = Inter({ subsets: ["latin"] });
-// import { Inter } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] });
+import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -15,8 +15,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      {/* <body className={inter.className}> */}
-      <body>
+      <body className={inter.className}>
         <ThirdwebProvider>{children}</ThirdwebProvider>
       </body>
     </html>

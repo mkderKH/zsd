@@ -11,19 +11,24 @@ import {
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { Button, Form, Input, Row, Col, Modal, message } from "antd";
 import { approve, balanceOf } from "thirdweb/extensions/erc20";
-import { APIConfig } from "../../abi/APIConfiguration";
 import { bscTestnet } from "thirdweb/chains";
-import { USDTAbi } from "../../abi/USDTAbi";
-import styles from "./index.module.scss";
+import { APIConfig } from "../../abi/APIConfiguration";
 
+import { USDTAbi } from "../../abi/USDTAbi";//USDTABI
+import { ZSDABI } from "../../abi/ZSDABI";  //ZSDABI
+import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";  //ZSDPROJECTABI
+import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
+
+import styles from "./index.module.scss";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
+
 const contractABI: any = USDTAbi;
+const contractZSDABI: any = ZSDABI;
+const contractZSDPROJECTABI: any = ZSDPROJECTABI;
+const contractZSDSwapABI: any = ZSDSwapABI;
 
 const Commonform = () => {
-  const [formModal] = Form.useForm();
-  const [formONE] = Form.useForm();
-  const [form] = Form.useForm();
   const [isButtonDisabledZSD, setIsButtonDisabledZSD] = useState<boolean>(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +36,9 @@ const Commonform = () => {
   const [zsdValue, setZsdValue] = useState<any>();
   const [token, setToken] = useState<any>();
   const account: any = useActiveAccount();
+  const [formModal] = Form.useForm();
+  const [formONE] = Form.useForm();
+  const [form] = Form.useForm();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
 
   //USDT
@@ -41,13 +49,26 @@ const Commonform = () => {
   });
 
   //用户必须已经授权本合约从USDT合约划转账务
-  const ZSDContract = getContract({
+  const ZSD = getContract({
     client: client,
     address: APIConfig.ZSDaddress,
+    abi: contractZSDABI,
     chain: bscTestnet,
-    abi: contractABI,
   });
 
+  const ZSDProjectContract = getContract({
+    client: client,
+    address: APIConfig.ZSDPROJECTAddress,
+    abi: contractZSDPROJECTABI,
+    chain: bscTestnet,
+  });
+
+  const ZSDSwap = getContract({
+    client: client,
+    address: APIConfig.ZSDSwapAddress,
+    abi: contractZSDSwapABI,
+    chain: bscTestnet,
+  });
   const handleUsdtChange = (value: any) => {
     // 重置表单
     formONE.resetFields();
@@ -91,7 +112,6 @@ const Commonform = () => {
   };
 
   const showModal = () => {
-    // form.resetFields(); //重置表单
     setIsModalOpen(true);
   };
 
@@ -101,50 +121,16 @@ const Commonform = () => {
 
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
-    if (!ZSDContract) {
-      console.error("Contract is not defined");
-      return;
-    }
     try {
-      //用户usdt的余额
-      const USDTBalance = await readContract({
-        contract: USDT,
-        method: "function balanceOf(address) view returns (uint256)",
-        params: [account.address],
-      });
-      //用户的zsd余额
-      const ZSDBalance = await readContract({
-        contract: ZSDContract,
-        method: "function balanceOf(address) view returns (uint256)",
-        params: [account.address],
-      });
-      console.log("账户余额：", USDTBalance, "====", ZSDBalance);
-
-      //zsd合约有权限调用用户 balance的资产
-      const banlance: any = 10000000000000000000000000 * 10 ** 18;
-      //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
-      const tx1 = prepareContractCall({
-        contract: USDT,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDaddress, banlance],
-      });
-      // 用户将usdt转给zsd合约
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account,
-      });
-      console.log("赋权1:", tx1Result);
-
       // 用户给zsd充值的数量不能超过balance
       const transaction = prepareContractCall({
-        contract: ZSDContract,
+        contract: ZSDProjectContract,
         method: "function depositUSDTFunds(uint256)",
         params: [toWei(amount)],
       });
       // 发送交易并等待用户签名确认
       const result = await sendTransaction(transaction);
       console.log(result, "-----------", amount);
-
       message.info("您的USDT充值成功");
       formONE.resetFields();
       setUsdtValue("");
@@ -158,49 +144,56 @@ const Commonform = () => {
 
   // 充值ZSD
   async function depositZSDFunds(amount: any) {
-    if (!ZSDContract) {
-      console.error("Contract is not defined");
-      return;
-    }
     try {
       // 确保 amount 是字符串格式
       const amountStr = amount.toString();
-      if (!ZSDContract) {
-        console.error("Contract is not defined");
-        return;
-      }
       try {
-        const banlance: any = 10000000000000000000000000 * 10 ** 18;
+
+        //用户的zsd余额
+        const ZSDBalance = await readContract({
+          contract: ZSD,
+          method: "function balanceOf(address) view returns (uint256)",
+          params: [account.address],
+        });
+
+
+        if (ZSDBalance <= 0) {
+          message.info("您的ZSD余额不足");
+          return;
+        }
+        //用户usdt的余额
+        const allowanceZSDBalance = await readContract({
+          contract: ZSD,
+          method: "function allowance(address, address)",
+          params: [account.address, APIConfig.ZSDaddress],
+        });
+
+        const banlance: any = 100000000000000000000000000000 * 10 ** 18;
+
+        if (allowanceZSDBalance <= 0) {
+          // if (allowanceZSDBalance < banlance) {
+          //用户将自己的 zsd转出banlance的权限赋予zsd合约
+          const tx2 = prepareContractCall({
+            contract: ZSD,
+            method: "function approve(address, uint256) returns (bool)",
+            params: [APIConfig.ZSDaddress, banlance],
+          });
+          const tx2Result = await sendAndConfirmTransaction({
+            transaction: tx2,
+            account: account,
+          });
+        }
+
         //用户usdt的余额
         const USDTBalance = await readContract({
           contract: USDT,
           method: "function balanceOf(address) view returns (uint256)",
           params: [account.address],
         });
-        //用户的zsd余额
-        const ZSDBalance = await readContract({
-          contract: ZSDContract,
-          method: "function balanceOf(address) view returns (uint256)",
-          params: [account.address],
-        });
-        //用户usdt的余额
-        const allowanceZSDBalance = await readContract({
-          contract: ZSDContract,
-          method: "function allowance(address, address)",
-          params: [account.address, APIConfig.ZSDaddress],
-        });
 
-        // if (allowanceZSDBalance < banlance) {
-        //用户将自己的 zsd转出banlance的权限赋予zsd合约
-        const tx2 = prepareContractCall({
-          contract: ZSDContract,
-          method: "function approve(address, uint256) returns (bool)",
-          params: [APIConfig.ZSDaddress, banlance],
-        });
-        const tx2Result = await sendAndConfirmTransaction({
-          transaction: tx2,
-          account: account,
-        });
+        // if (USDTBalance == 0) {
+        //   message.info("USDT余额为0，请充值USDT");
+        //   return;
         // }
 
         //用户授权给ZSD合约可操作usdt的余额
@@ -210,25 +203,25 @@ const Commonform = () => {
           params: [account.address, APIConfig.ZSDaddress],
         });
 
-        // if (allowanceUSDTBalance < toWei(amount).valueOf()) {
-        //zsd合约有权限调用用户 balance的资产
-        //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
-        const tx1 = prepareContractCall({
-          contract: USDT,
-          method: "function approve(address, uint256) returns (bool)",
-          params: [APIConfig.ZSDaddress, banlance],
-        });
-        // 用户将usdt转给zsd合约
-        const tx1Result = await sendAndConfirmTransaction({
-          transaction: tx1,
-          account: account,
-        });
-        // }
+        if (allowanceUSDTBalance < toWei(amount).valueOf()) {
+          //zsd合约有权限调用用户 balance的资产
+          //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
+          const tx1 = prepareContractCall({
+            contract: USDT,
+            method: "function approve(address, uint256) returns (bool)",
+            params: [APIConfig.ZSDaddress, banlance],
+          });
+          // 用户将usdt转给zsd合约
+          const tx1Result = await sendAndConfirmTransaction({
+            transaction: tx1,
+            account: account,
+          });
+        }
 
         // 用户给zsd充值的数量不能超过balance
         const transaction = prepareContractCall({
-          contract: ZSDContract,
-          method: "  function depositUSDTANDZSDFunds(uint256) ",
+          contract: ZSDProjectContract,
+          method: "function depositUSDTANDZSDFunds(uint256)",
           params: [toWei(amountStr)],
         });
         // 发送交易并等待用户签名确认(首次需要，第二次不需要)
@@ -257,10 +250,6 @@ const Commonform = () => {
         // console.log(valuesmodal.RechargeAddress, "=================", valuesUSDT.USDT_one_SingleCharge);
 
         formONE.resetFields();
-        if (!ZSDContract) {
-          console.error("Contract is not defined");
-          return;
-        }
         try {
           //用户usdt的余额
           const USDTBalance = await readContract({
@@ -270,7 +259,7 @@ const Commonform = () => {
           });
           //用户的zsd余额
           const ZSDBalance = await readContract({
-            contract: ZSDContract,
+            contract: ZSD,
             method: "function balanceOf(address) view returns (uint256)",
             params: [valuesmodal.RechargeAddress],
           });
@@ -299,7 +288,7 @@ const Commonform = () => {
           // }
           // 用户给zsd充值的数量不能超过balance
           const transaction = prepareContractCall({
-            contract: ZSDContract,
+            contract: ZSD,
             method: "function depositUSDTFunds(uint256)",
             params: [toWei(valuesUSDT.USDT_one_SingleCharge)],
           });
@@ -321,7 +310,7 @@ const Commonform = () => {
         // console.log("输入地址：",valuesmodal.RechargeAddress,"输入ZSD：",valuesZSD.usdtInput,"登录账号：",account);
 
         form.resetFields();
-        if (!ZSDContract) {
+        if (!ZSD) {
           console.error("Contract is not defined");
           return;
         }
@@ -338,13 +327,13 @@ const Commonform = () => {
           });
           //用户的zsd余额
           const ZSDBalance = await readContract({
-            contract: ZSDContract,
+            contract: ZSD,
             method: "function balanceOf(address) view returns (uint256)",
             params: [valuesmodal.RechargeAddress],
           });
           //用户usdt的余额
           const allowanceZSDBalance = await readContract({
-            contract: ZSDContract,
+            contract: ZSD,
             method: "function allowance(address, address)",
             params: [valuesmodal.RechargeAddress, APIConfig.ZSDaddress],
           });
@@ -352,7 +341,7 @@ const Commonform = () => {
           // if (allowanceZSDBalance < banlance) {
           //用户将自己的 zsd转出banlance的权限赋予zsd合约
           const tx2 = prepareContractCall({
-            contract: ZSDContract,
+            contract: ZSD,
             method: "function approve(address, uint256) returns (bool)",
             params: [APIConfig.ZSDaddress, banlance],
           });
@@ -386,7 +375,7 @@ const Commonform = () => {
 
           // 用户给zsd充值的数量不能超过balance
           const transaction = prepareContractCall({
-            contract: ZSDContract,
+            contract: ZSD,
             method: "  function depositUSDTANDZSDFunds(uint256) ",
             params: [toWei(amountStr)],
           });
@@ -472,7 +461,7 @@ const Commonform = () => {
   //   try {
   //     // 调用智能合约的getAmountOut函数
   //     const ZSDamountOut = await readContract({
-  //       contract: ZSDContract,
+  //       contract: ZSD,
   //       method:
   //         "function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut)",
   //       params: [],
@@ -682,10 +671,10 @@ const Commonform = () => {
               <Form.Item
                 name="RechargeAddress"
                 label="充值地址"
-                // rules={[
-                //   { required: true, message: "请输入充值地址!" },
-                //   { validator: amountValidatorModel },
-                // ]}
+              // rules={[
+              //   { required: true, message: "请输入充值地址!" },
+              //   { validator: amountValidatorModel },
+              // ]}
               >
                 <Input
                   className={styles.inputstyle}

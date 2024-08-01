@@ -1,28 +1,32 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { message, Modal, Input, Form, Button, Row, Col } from "antd";
 import { createWallet, walletConnect } from "thirdweb/wallets";
 import { ConnectButton } from "thirdweb/react";
 import { bscTestnet } from "thirdweb/chains";
 import { client } from "../../src/app/client";
-// import { Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import type { Metadata } from "next";
-// const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 import styles from "./index.module.scss";
 
-// 调用合约判断是否授权
 import {
   getContract,
   prepareContractCall,
   sendAndConfirmTransaction,
+  readContract,
 } from "thirdweb";
 import { APIConfig } from "../../abi/APIConfiguration";
 import { useActiveAccount } from "thirdweb/react";
-// import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { USDTAbi } from "../../abi/USDTAbi";
-const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
-// const thirdweb = new ThirdwebSDK(THIRDWEB_PROJECT_ID);
+import { ZSDABI } from "../../abi/ZSDABI";  //ZSDABI
+import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";  //ZSDPROJECTABI
+// import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
+
+// const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 const contractABI: any = USDTAbi;
+const contractZSDABI: any = ZSDABI;
+const contractZSDPROJECTABI: any = ZSDPROJECTABI;
 
 export const metadata: Metadata = {
   title: "ZSD",
@@ -36,13 +40,37 @@ const wallets: any = [
   walletConnect(),
 ];
 
-//用户必须已经授权本合约从USDT合约划转账务
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
   chain: bscTestnet,
+  abi: contractABI
+});
+
+//USDT
+const USDT = getContract({
+  client: client,
+  address: APIConfig.USDTaddress,
+  chain: bscTestnet,
   abi: contractABI,
 });
+
+//用户必须已经授权本合约从USDT合约划转账务
+const ZSD = getContract({
+  client: client,
+  address: APIConfig.ZSDaddress,
+  abi: contractZSDABI,
+  chain: bscTestnet,
+});
+
+// ZSDProject
+const ZSDProjectfun = getContract({
+  client: client,
+  address: APIConfig.ZSDPROJECTAddress,
+  chain: bscTestnet,
+  abi: contractZSDPROJECTABI,
+});
+
 
 const CallWallet = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -75,6 +103,7 @@ const CallWallet = () => {
   //     message.error('登出钱包失败，请重试。');
   //   }
   // };
+
   const handleCancel = async () => {
     if (!wallets || wallets.length === 0) {
       message.error("没有可登出的钱包");
@@ -97,70 +126,113 @@ const CallWallet = () => {
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const Inviteaddress: any = params.get("ref");
+    console.log(account.address, "邀请人地址:", Inviteaddress);
 
-    if (Inviteaddress) {
-      try {
-        const registerTX = prepareContractCall({
-          contract: ZSDContract,
-          method: "function register(address)",
-          params: [Inviteaddress],
-        });
-        const registerTXResult = await sendAndConfirmTransaction({
-          transaction: registerTX,
-          account: account,
-        });
-      } catch (error: any) {
-        const firstLine = error.toString().split("\n")[0];
-        const match = firstLine.match(/TransactionError: Error - (.+)/);
-        if (match && match[1]) {
-          switch (match[1]) {
-            case "referrer has not deposited":
-              message.info("邀请人必须已经投资过");
-              break;
-            case "User already registered":
-              message.info("邀请用户未注册");
-              break;
-            case "You cannot refer":
-              message.info("邀请人和用户不是同一个人");
-              break;
-            default:
-              message.error("发生未知错误");
-              break;
-          }
+    try {
+      // 查询是否已注册
+      const registerTX = prepareContractCall({
+        contract: ZSDProjectfun,
+        method: "function register(address)",
+        params: [Inviteaddress],
+      });
+      const registerTXResult = await sendAndConfirmTransaction({
+        transaction: registerTX,
+        account: account,
+      });
+      console.log("查询是否已注册:", registerTXResult);
+
+
+      // *********************************************************登录后授权*********************************************************************
+      //用户USDT的余额
+      const USDTBalance = await readContract({
+        contract: USDT,
+        method: "function balanceOf(address) view returns (uint256)",
+        params: [account.address],
+      });
+      console.log("USDT余额:", USDTBalance);
+
+
+      // if (USDTBalance == 0) {
+      //   message.info("USDT余额为0，请充值USDT");
+      //   return;
+      // }
+
+
+      const allowanceUSDTBalance = await readContract({
+        contract: USDT,
+        method: "function allowance(address, address)",
+        params: [account.address, APIConfig.ZSDPROJECTAddress],
+      });
+
+      if (allowanceUSDTBalance == 0) {
+        message.info("请授权ZSD合约使用您的USDT");
+        return;
+      }
+      // if (USDTBalance < 0) {
+      //zsd合约有权限调用用户 balance的资产 ||  用户将自己的 USDT转出banlance的权限赋予zsd合约
+      const banlance: any = 10000000000000000000000000 * 10 ** 18;
+      const tx1 = prepareContractCall({
+        contract: USDT,
+        method: "function approve(address, uint256) returns (bool)",
+        params: [APIConfig.ZSDPROJECTAddress, banlance],
+      });
+      console.log(tx1, 'tx1')
+      // 用户将usdt转给zsd合约
+      const tx1Result = await sendAndConfirmTransaction({
+        transaction: tx1,
+        account: account,
+      });
+
+      // }
+    } catch (error: any) {
+      console.log("查询是否已注册:", error);
+
+
+      const firstLine = error.toString().split("\n")[0];
+      const match = firstLine.match(/TransactionError: Error - (.+)/);
+      if (match && match[1]) {
+        switch (match[1]) {
+          case "referrer has not deposited":
+            message.info("邀请人必须已经投资过");
+            break;
+          case "User already registered":
+            message.info("邀请用户未注册");
+            break;
+          case "You cannot refer":
+            message.info("邀请人和用户不是同一个人");
+            break;
+          default:
+            message.error("发生未知错误");
+            break;
+        }
+        setIsModalOpen(true);
+      } else if (error instanceof TypeError) {
+        if (
+          error.message.includes(
+            "Cannot read properties of null (reading '1')"
+          )
+        ) {
+          message.error("发生错误：尝试读取 null 对象的属性");
           setIsModalOpen(true);
-        } else if (error instanceof TypeError) {
-          if (
-            error.message.includes(
-              "Cannot read properties of null (reading '1')"
-            )
-          ) {
-            message.error("发生错误：尝试读取 null 对象的属性");
-            setIsModalOpen(true);
-          } else {
-            message.error("发生类型错误");
-            setIsModalOpen(true);
-          }
         } else {
-          message.error("输入错误，请输入正确的邀请人地址");
+          message.error("发生类型错误");
           setIsModalOpen(true);
         }
+      } else {
+        message.error("输入错误，请输入正确的邀请人地址");
+        setIsModalOpen(true);
       }
-    } else {
-      // message.error('未填写邀请码，请输入邀请人地址');
     }
-  };
+  }
 
   // 输入邀请链接
   const onFriendRechargeFun = async () => {
     const values = form.getFieldsValue();
-    const search = values.Invitelink;
-    const params = new URLSearchParams(new URL(search).search);
-    const Inviteaddress: any = params.get("ref");
     try {
       const registerTX = prepareContractCall({
         contract: ZSDContract,
         method: "function register(address)",
-        params: [Inviteaddress],
+        params: [values.Invitelink],
       });
       const registerTXResult = await sendAndConfirmTransaction({
         transaction: registerTX,
@@ -195,18 +267,19 @@ const CallWallet = () => {
           message.error("发生类型错误");
           setIsModalOpen(true);
         }
-      } else {
+      }
+      else {
         message.error("输入错误，请输入正确的邀请人地址");
         setIsModalOpen(true);
       }
     }
   };
 
-  // useEffect(() => {
-  //   if (account) {
-  //     WhetherInviteUsers();
-  //   }
-  // }, [account, WhetherInviteUsers]);
+  useEffect(() => {
+    if (account) {
+      WhetherInviteUsers();
+    }
+  }, [account]);
 
   // 假设这些方法是在一个服务或者工具类中实现的，可以根据实际情况调用相关的身份验证服务或API
   // 检查用户是否已经登录
@@ -246,11 +319,8 @@ const CallWallet = () => {
   //   // 在这里实现登出的具体逻辑，例如清除本地存储的用户信息或者调用后端服务来注销用户
   //   console.log("执行登出操作");
   // };
-
   return (
-    // <div className={inter.className}>
-
-    <div>
+    <div className={inter.className}>
       <ConnectButton
         theme={"dark"}
         connectModal={{ size: "compact" }}
@@ -258,7 +328,6 @@ const CallWallet = () => {
         client={client}
         chain={bscTestnet}
       />
-
       <Modal
         title=""
         open={isModalOpen}
@@ -282,12 +351,12 @@ const CallWallet = () => {
       >
         <Form form={form} name="friendRechargeForm">
           <Row>
-            <div className={styles.Topmodel}>邀请链接</div>
+            <div className={styles.Topmodel}>邀请人地址</div>
             <Col span={24}>
               <Form.Item name="Invitelink">
                 <Input
                   className={styles.inputstyle}
-                  placeholder="请填写/粘帖邀请链接"
+                  placeholder="请填写/粘帖邀请链地址"
                 />
               </Form.Item>
             </Col>

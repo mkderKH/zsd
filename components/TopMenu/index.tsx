@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useContext, useRef } from "react";
+import React, { useEffect, useContext, useRef, useState } from "react";
 import { useActiveAccount } from "thirdweb/react";
 import Image from "next/image";
 import styles from "./index.module.scss";
@@ -88,7 +88,7 @@ const ClientMenu: React.FC = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [hideRightMenu]); // 空依赖数组表示这个 useEffect 只在组件挂载时执行一次
+  }, [hideRightMenu]);
   return (
     <div className={styles.pageMenu}>
       {isRightMenuVisible && <RightMenu />}
@@ -130,7 +130,6 @@ const ClientMenu: React.FC = () => {
               <div className={styles["menyBtn-n"]}>{v.name}</div>
               <div className={styles["menyBtn-e"]}>{v.en}</div>
             </div>
-            // </Link>
           );
         })}
       </div>
