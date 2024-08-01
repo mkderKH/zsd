@@ -23,48 +23,6 @@ const Market = () => {
     getCurrenciesData();
   }, []);
 
-  // const getCurrenciesData = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const ids = "bitcoin,ethereum,binancecoin,ripple,solana,dogecoin";
-  //     const response = await axios.get(
-  //       `https://meta-world.dappweb.cn:38001/utility/v1/market/tokens`,
-  //       {
-  //         params: {
-  //           category: "onekey-gainers",
-  //           sparkline: true,
-  //           sparklinePoints: 100,
-  //           ids: ids,
-  //         },
-  //         headers: {
-  //           "Cache-Control": "max-age=0", // 例如，请求时计算得出的值
-  //           Cookie: "SESSIONID=...", // 需要在发送请求时计算得出
-  //           Host: "meta-world.dappweb.cn:38001",
-  //           "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
-  //           Accept: "*/*", // 通常用于接受所有类型的响应
-  //           "Accept-Encoding": "gzip, deflate, br", // 浏览器支持的压缩格式
-  //           Connection: "keep-alive",
-  //           "X-Onekey-Request-Currency": "usd", // 根据您提供的参数
-  //         },
-  //       }
-  //     );
-  //     setCurrencies(response.data.data);
-  //     setLoading(false);
-  //     // if (response.status === 0 && Array.isArray(response.data)) {
-  //     //   setCurrencies(response.data)
-  //     //   setLoading(false);
-  //     // } else {
-  //     //   console.error('响应数据格式不正确或请求失败');
-  //     //   setLoading(false);
-  //     //   setCurrencies([]);
-  //     // }
-  //   } catch (error) {
-  //     console.error("请求错误:", error);
-  //     setLoading(false);
-  //     setCurrencies([]);
-  //   }
-  // };
-
   const getCurrenciesData = async () => {
     try {
       setLoading(true);
@@ -152,7 +110,6 @@ const Market = () => {
             </div>
           </div> */}
         </div>
-
         <div className={styles.fluctuateInfo}>
           <span className={styles.newtext}>24H波动</span>
           {/* <div className={styles.sortStyle}>
@@ -194,7 +151,6 @@ const Market = () => {
                 width={48}
                 height={48}
               />
-
               <div>
                 <div className={styles.currencyName}>{currency.name}</div>
                 <div className={styles.currencyMarketCap}>
@@ -202,11 +158,9 @@ const Market = () => {
                 </div>
               </div>
             </div>
-
             <div className={styles.currencyPrice}>
               ${currency.price.toFixed(2)}
             </div>
-
             <div
               className={styles.currencyChange}
               style={{
