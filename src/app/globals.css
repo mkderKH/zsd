@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	line-height: 1.5;
+	font-weight: 400;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-family: 'Inter', sans-serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+	font-variation-settings: 'slnt'0;
+}
+
+@layer base {
+	body {
+		background: url("https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/cbg.png") no-repeat;
+		background-position: center;
+		/* @apply bg-zinc-950 text-neutral-200; */
+	}
+
+	.tw-connect-wallet .css-bedeeg {
+		width: '130px';
+		padding: '5px 0';
+		border-radius: 15px;
+		border: '1px solid #e89e2c';
+		text-align: center;
+		color: '#e89e2c';
+		font-size: 16px;
+	}
+}

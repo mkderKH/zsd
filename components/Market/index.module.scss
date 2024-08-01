@@ -1,0 +1,104 @@
+.container {
+  width: 90%;
+  border-radius: 15px;
+  opacity: 0.8;
+  margin: 0 auto;
+  color: #fff;
+  background: rgba(224, 224, 224, 0.19);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  .marketstyle {
+    width: 40px;
+    height: 28px;
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+    line-height: 28px;
+    margin: auto;
+    font-style: normal;
+    border-bottom: 3px solid #e89e2c;
+  }
+  .titleContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 14px 0px;
+    margin-left: 33px;
+  }
+  .container .marketInfo,
+  .container .priceInfo,
+  .container .fluctuateInfo {
+    flex: 1;
+    text-align: center;
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 400;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+    font-style: normal;
+    margin-left: 15px;
+  }
+  .priceInfo {
+    display: flex; /* 使用Flexbox布局 */
+    align-items: center; /* 垂直居中对齐 */
+  }
+  .fluctuateInfo {
+    display: flex; /* 使用Flexbox布局 */
+    align-items: center; /* 垂直居中对齐 */
+  }
+  .currencyItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 10px;
+    padding-bottom: 10px;
+  }
+  .currencyPrice {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 400;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+    // text-align: right;
+    font-style: normal;
+  }
+
+  .currencyInfo {
+    display: flex;
+    align-items: center;
+    .btnIcon {
+      width: 20px;
+      margin-right: 15px;
+    }
+    .currencyName {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e89e2c;
+      line-height: 20px;
+    }
+    .newtext {
+      vertical-align: super;
+    }
+    .sortStyle {
+      align-items: center; /* 水平对齐 */
+      margin-left: 10px; /* 根据需要调整图标与文字的间距 */
+      display: inline-block;
+    }
+    .sortIcon {
+      display: flex;
+      flex-direction: column; /* 垂直排列子元素 */
+      justify-content: center; /* 垂直居中 */
+      margin: 0; /* 重置margin，避免默认间距 */
+      display: inline-block;
+    }
+    .sortIcon span {
+      cursor: pointer; /* 添加鼠标指针样式 */
+      font-size: 14px;
+    }
+  }
+}

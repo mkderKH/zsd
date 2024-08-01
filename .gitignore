@@ -8,6 +8,7 @@
 .next
 .yarn.lock
 .package-lock.json
+.out
 
 # testing
 /coverage

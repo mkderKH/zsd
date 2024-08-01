@@ -1,0 +1,169 @@
+.Content {
+  width: 80%;
+  font-size: 14px;
+  backdrop-filter: blur(7px);
+  border-radius: 15px;
+  //   opacity: 0.8;
+  background: rgba(224, 224, 224, 0.19);
+  margin: 0 auto;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+  .inputstyle {
+    background: #d8d8d8;
+    color: black;
+    border-radius: 4px;
+    // height: 40px;
+    line-height: 25px;
+  }
+  .buttonstyle {
+    width: 100%;
+    height: 40px;
+    background: #e89e2c;
+    // opacity: 0.8;
+    backdrop-filter: blur(2px);
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 18px;
+    color: #ffffff;
+    line-height: 25px;
+    text-align: left;
+    font-style: normal;
+  }
+  .buttonHelpFriendstyle {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #e89e2c;
+    color: #e89e2c;
+    font-size: 18px;
+    background: rgba(49, 47, 47, 0);
+    line-height: 25px;
+    border-radius: 4px;
+    // opacity: 0.8;
+    backdrop-filter: blur(2px);
+  }
+  .ContentText {
+    text-align: center;
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+    line-height: 28px;
+    text-align: center;
+    font-style: normal;
+    border-bottom: 3px solid #e89e2c;
+  }
+  .ContentInstructions {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 400;
+    font-size: 14px;
+    color: #999999;
+    line-height: 20px;
+    font-style: normal;
+    margin: 10px auto;
+  }
+  .Contentlabel {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+  }
+  .labelContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+  }
+  .labelLeft {
+    margin-right: auto;
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+  }
+  .labelRight {
+    margin-left: auto;
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: right;
+    font-style: normal;
+  }
+  .cost {
+    text-align: justify;
+  }
+  .CalculatedValue {
+    text-align: justify;
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 400;
+    font-size: 14px;
+    color: #d8d8d8;
+    line-height: 40px;
+    font-style: normal;
+  }
+  .Ustyle {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+  }
+  .currencycontainer {
+    width: 100%;
+    margin-top: 23px;
+    padding: 0px 30px;
+    display: flex; /* 使用flex布局 */
+    justify-content: space-between; /* 子元素分布在容器内，两端对齐，中间间隔均匀 */
+    align-items: flex-start; /* 子元素在交叉轴上向起始位置对齐 */
+  }
+  .currencyrow {
+    width: 50%;
+    display: inline-block;
+  }
+  .USDTstyle {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+    text-align: center;
+    font-style: normal;
+  }
+  .USDTnuber {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 600;
+    font-size: 28px;
+    color: #e89e2c;
+    line-height: 40px;
+    font-style: normal;
+  }
+  .NumberPeoplestyle {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 600;
+    font-size: 28px;
+    color: #ffffff;
+    line-height: 40px;
+    text-align: center;
+    font-style: normal;
+  }
+  .NumberPeople {
+    // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+    text-align: center;
+    font-style: normal;
+  }
+}

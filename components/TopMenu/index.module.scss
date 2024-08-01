@@ -1,0 +1,85 @@
+.pageMenu {
+  background: url("https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/bgGif.gif")
+    no-repeat;
+  // background-size: 101%;
+  background-size: contain;
+  height: 400px;
+  background-position: center;
+  position: relative;
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .menyBtn0 {
+    position: absolute;
+    top: 43%;
+  }
+  .menyBtn1 {
+    position: absolute;
+    top: 66%;
+    left: 13%;
+  }
+  .menyBtn2 {
+    position: absolute;
+    left: 22%;
+    top: 24%;
+  }
+  .menyBtn3 {
+    position: absolute;
+    top: 46%;
+    left: 34%;
+  }
+  .menyBtn4 {
+    position: absolute;
+    top: 34%;
+    left: 53%;
+  }
+  .menyBtn5 {
+    position: absolute;
+    right: 3%;
+    bottom: 11%;
+  }
+
+  .menyBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .menyBtn-n {
+      color: #ffffff;
+      font-size: 14px;
+    }
+    .menyBtn-e {
+      color: #e5cf99;
+      font-size: 9px;
+      white-space: nowrap;
+    }
+  }
+  img {
+    max-width: none;
+  }
+  .img0 {
+    width: 66px;
+    height: 68px;
+  }
+  .img1 {
+    width: 57px;
+    height: 58px;
+  }
+  .img2 {
+    width: 49px;
+    height: 50px;
+  }
+  .img3 {
+    width: 49px;
+    height: 49px;
+  }
+  .img4 {
+    width: 118px;
+    height: 118px;
+  }
+  .img5 {
+    width: 64px;
+    height: 64px;
+  }
+}

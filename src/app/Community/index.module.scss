@@ -1,0 +1,42 @@
+.chatcontainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 13px;
+}
+
+.chatbubble {
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  padding: 10px;
+  position: relative;
+}
+
+.chatbubble .icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.chatbubble .icon img {
+  width: 53px;
+  height: 53px;
+  max-width: none;
+}
+
+.chatbubble .message {
+  padding: 5px 20px;
+  width: 263px;
+  text-align: left;
+  height: 53px;
+  position: relative;
+  background: url("https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/xpp.png") no-repeat;
+  left: 5px;
+  background-size: contain;
+  color: #333333;
+}
