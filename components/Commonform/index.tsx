@@ -501,8 +501,10 @@ const Commonform = () => {
         >
           <Row>
             <Col span={24}>
+              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：2540</span></div>
+            </Col>
+            <Col span={24}>
               <Form.Item
-                label={<span className={styles.Contentlabel}>USDT</span>}
                 colon={false}
                 name="USDT_one_SingleCharge"
                 rules={[
@@ -528,6 +530,7 @@ const Commonform = () => {
               </Form.Item>
             </Col>
           </Row>
+
           <Row>
             <Col span={24}>
               <Form.Item>
@@ -570,8 +573,11 @@ const Commonform = () => {
         >
           <Row>
             <Col span={24}>
+              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：1020</span></div>
+            </Col>
+            <Col span={24}>
               <Form.Item
-                label={<span className={styles.Contentlabel}>USDT</span>}
+                // label={<span className={styles.Contentlabel}>USDT</span>}
                 colon={false}
                 name="usdtInput"
                 initialValue={usdtValue}

@@ -63,15 +63,7 @@
     margin-bottom: 20px;
     margin-top: 8px;
   }
-  .Contentlabel {
-    // font-family: "PingFang-SC, PingFang-SC";
-    font-weight: 500;
-    font-size: 16px;
-    color: #ffffff;
-    line-height: 22px;
-    text-align: left;
-    font-style: normal;
-  }
+
   .labelContainer {
     display: flex;
     justify-content: space-between;
@@ -108,6 +100,32 @@
   }
   .Ustyle {
     // font-family: "PingFang-SC, PingFang-SC";
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+  }
+
+  .ComputingPower {
+    width: 100%;
+    display: flex; /* 使用flex布局 */
+    justify-content: space-between; /* 使子元素两端对齐 */
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 5px;
+  }
+
+  .Contentlabel {
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+  }
+
+  .power {
     font-weight: 500;
     font-size: 16px;
     color: #ffffff;
