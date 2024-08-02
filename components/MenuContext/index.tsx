@@ -3,8 +3,8 @@ import React, { createContext, useState, ReactNode } from "react";
 
 export const MenuContext = createContext({
   isRightMenuVisible: false,
-  toggleRightMenu: () => {},
-  hideRightMenu: () => {},
+  toggleRightMenu: () => { },
+  hideRightMenu: () => { },
 });
 
 export const MenuProvider = ({ children }: { children: ReactNode }) => {

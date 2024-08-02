@@ -57,7 +57,7 @@ const ClientMenu: React.FC = () => {
   };
 
   const handleCopyClick = () => {
-    const textToCopy = `http://localhost:3000/HomeLess?ref=${account.address}`;
+    const textToCopy = `http://localhost:3000/HomeLess?ref=${account ? account.address : ''}`;
     copyToClipboard(textToCopy);
   };
 
@@ -103,9 +103,6 @@ const ClientMenu: React.FC = () => {
 
       <div className={styles.top} ref={containerRef}>
         {imageArray.map((v, i) => {
-          console.log(v, '===============================', i);
-
-
           if (v.link === "/InCode") {
             return (
               <div

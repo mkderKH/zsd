@@ -4,8 +4,8 @@ export const APIConfig = {
 
   // ZSDABI合约地址
   ZSDaddress: "0x10aee9b5f48c27d0f6cc6ea9a127346be87f49d0",
-  // ZSDPROJECTABI合约地址
-  ZSDPROJECTAddress: "0x07a808389f7108d6d05ed6d4ece6d795d6d8a580",
   // ZSDSwapABI合约地址
-  ZSDSwapAddress: "0xbb3804121843969f4f3adf8014e53dafbba6f31e",
+  ZSDSwapAddress: "0x68d564a2dc5e67ce0cb7fecfe10cdbf1afa1f670",
+  // ZSDPROJECTABI合约地址
+  ZSDPROJECTAddress: "0x17aeadfece3180007a3d3a029a925b3ffff735a4",
 };

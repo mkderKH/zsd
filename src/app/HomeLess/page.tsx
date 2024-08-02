@@ -7,7 +7,6 @@ const Content = dynamic(() => import("../../../components/CommBg"), {
 });
 import { MenuProvider } from "../../../components/MenuContext";
 import Market from "../../../components/Market";
-
 const HomeLess: React.FC = () => {
   return (
     <MenuProvider>

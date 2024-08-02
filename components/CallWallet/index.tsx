@@ -369,9 +369,9 @@ const CallWallet = () => {
     <div>
       <ConnectButton
         theme={"dark"}
-        connectModal={{ size: "compact" }}
-        wallets={wallets}
         client={client}
+        wallets={wallets}
+        connectModal={{ size: "compact" }}
         chain={bscTestnet}
       />
 
@@ -383,6 +383,8 @@ const CallWallet = () => {
           onOk={handleOk}
           onCancel={handleCancel}
           destroyOnClose={true}
+          width={"90%"}
+          style={{ margin: 'auto', top: '20%' }}
           footer={
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <Button onClick={handleCancel} className={styles.Cancelstyle}>
