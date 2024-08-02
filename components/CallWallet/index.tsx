@@ -5,9 +5,9 @@ import { createWallet, walletConnect } from "thirdweb/wallets";
 import { ConnectButton } from "thirdweb/react";
 import { bscTestnet } from "thirdweb/chains";
 import { client } from "../../src/app/client";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import type { Metadata } from "next";
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 import styles from "./index.module.scss";
 
 import {
@@ -21,9 +21,10 @@ import { useActiveAccount } from "thirdweb/react";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";  //ZSDABI
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";  //ZSDPROJECTABI
-// import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
 
+// import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
 // const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
+
 const contractABI: any = USDTAbi;
 const contractZSDABI: any = ZSDABI;
 const contractZSDPROJECTABI: any = ZSDPROJECTABI;
@@ -123,11 +124,17 @@ const CallWallet = () => {
 
   // 判断用户是否登录
   const WhetherInviteUsers = async () => {
+    console.log(account, "是否登录111111111111111111111111111111111111111");
+
+    if (!account) {
+      message.error("请登录");
+      return;
+    }
+
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const Inviteaddress: any = params.get("ref");
     console.log(account.address, "邀请人地址:", Inviteaddress);
-
     try {
       // 查询是否已注册
       const registerTX = prepareContractCall({
@@ -157,7 +164,6 @@ const CallWallet = () => {
       //   return;
       // }
 
-
       const allowanceUSDTBalance = await readContract({
         contract: USDT,
         method: "function allowance(address, address)",
@@ -168,7 +174,6 @@ const CallWallet = () => {
         message.info("请授权ZSD合约使用您的USDT");
         return;
       }
-      // if (USDTBalance < 0) {
       //zsd合约有权限调用用户 balance的资产 ||  用户将自己的 USDT转出banlance的权限赋予zsd合约
       const banlance: any = 10000000000000000000000000 * 10 ** 18;
       const tx1 = prepareContractCall({
@@ -177,17 +182,14 @@ const CallWallet = () => {
         params: [APIConfig.ZSDPROJECTAddress, banlance],
       });
       console.log(tx1, 'tx1')
+
       // 用户将usdt转给zsd合约
       const tx1Result = await sendAndConfirmTransaction({
         transaction: tx1,
         account: account,
       });
-
-      // }
     } catch (error: any) {
       console.log("查询是否已注册:", error);
-
-
       const firstLine = error.toString().split("\n")[0];
       const match = firstLine.match(/TransactionError: Error - (.+)/);
       if (match && match[1]) {
@@ -219,7 +221,7 @@ const CallWallet = () => {
           setIsModalOpen(true);
         }
       } else {
-        message.error("输入错误，请输入正确的邀请人地址");
+        message.error("请输入邀请人地址");
         setIsModalOpen(true);
       }
     }
@@ -228,16 +230,62 @@ const CallWallet = () => {
   // 输入邀请链接
   const onFriendRechargeFun = async () => {
     const values = form.getFieldsValue();
+    const Inviteaddress: any = values.Invitelink
+    console.log(Inviteaddress, '======111==========', account);
+
+
+
     try {
       const registerTX = prepareContractCall({
         contract: ZSDContract,
         method: "function register(address)",
-        params: [values.Invitelink],
+        params: [Inviteaddress],
       });
       const registerTXResult = await sendAndConfirmTransaction({
         transaction: registerTX,
         account: account,
       });
+
+      // *********************************************************登录后授权*********************************************************************
+      //用户USDT的余额
+      const USDTBalance = await readContract({
+        contract: USDT,
+        method: "function balanceOf(address) view returns (uint256)",
+        params: [account.address],
+      });
+      console.log("USDT余额:", USDTBalance);
+
+
+      // if (USDTBalance == 0) {
+      //   message.info("USDT余额为0，请充值USDT");
+      //   return;
+      // }
+
+      const allowanceUSDTBalance = await readContract({
+        contract: USDT,
+        method: "function allowance(address, address)",
+        params: [account.address, APIConfig.ZSDPROJECTAddress],
+      });
+
+      if (allowanceUSDTBalance == 0) {
+        message.info("请授权ZSD合约使用您的USDT");
+        return;
+      }
+      //zsd合约有权限调用用户 balance的资产 ||  用户将自己的 USDT转出banlance的权限赋予zsd合约
+      const banlance: any = 10000000000000000000000000 * 10 ** 18;
+      const tx1 = prepareContractCall({
+        contract: USDT,
+        method: "function approve(address, uint256) returns (bool)",
+        params: [APIConfig.ZSDPROJECTAddress, banlance],
+      });
+
+      // 用户将usdt转给zsd合约
+      const tx1Result = await sendAndConfirmTransaction({
+        transaction: tx1,
+        account: account,
+      });
+
+      console.log("查询是否已注册:", registerTXResult);
     } catch (error: any) {
       const firstLine = error.toString().split("\n")[0];
       const match = firstLine.match(/TransactionError: Error - (.+)/);
@@ -267,8 +315,7 @@ const CallWallet = () => {
           message.error("发生类型错误");
           setIsModalOpen(true);
         }
-      }
-      else {
+      } else {
         message.error("输入错误，请输入正确的邀请人地址");
         setIsModalOpen(true);
       }
@@ -320,7 +367,9 @@ const CallWallet = () => {
   //   console.log("执行登出操作");
   // };
   return (
-    <div className={inter.className}>
+    // <div className={inter.className}>
+
+    <div>
       <ConnectButton
         theme={"dark"}
         connectModal={{ size: "compact" }}
@@ -328,41 +377,45 @@ const CallWallet = () => {
         client={client}
         chain={bscTestnet}
       />
-      <Modal
-        title=""
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        destroyOnClose={true}
-        footer={
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Button onClick={handleCancel} className={styles.Cancelstyle}>
-              取消
-            </Button>
-            <Button
-              className={styles.verifystyle}
-              htmlType="submit"
-              onClick={onFriendRechargeFun}
-            >
-              确认
-            </Button>
-          </div>
-        }
-      >
-        <Form form={form} name="friendRechargeForm">
-          <Row>
-            <div className={styles.Topmodel}>邀请人地址</div>
-            <Col span={24}>
-              <Form.Item name="Invitelink">
-                <Input
-                  className={styles.inputstyle}
-                  placeholder="请填写/粘帖邀请链地址"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Modal>
+
+      {
+        account &&
+        <Modal
+          title=""
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          destroyOnClose={true}
+          footer={
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Button onClick={handleCancel} className={styles.Cancelstyle}>
+                取消
+              </Button>
+              <Button
+                className={styles.verifystyle}
+                htmlType="submit"
+                onClick={onFriendRechargeFun}
+              >
+                确认
+              </Button>
+            </div>
+          }
+        >
+          <Form form={form} name="friendRechargeForm">
+            <Row>
+              <div className={styles.Topmodel}>邀请人地址</div>
+              <Col span={24}>
+                <Form.Item name="Invitelink">
+                  <Input
+                    className={styles.inputstyle}
+                    placeholder="请填写/粘帖邀请链地址"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        </Modal>
+      }
     </div>
   );
 };

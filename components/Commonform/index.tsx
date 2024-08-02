@@ -122,15 +122,27 @@ const Commonform = () => {
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
     try {
-      // 用户给zsd充值的数量不能超过balance
+      const banlance: any = 10000000000000000000000000 * 10 ** 18;
+      const tx1 = prepareContractCall({
+        contract: USDT,
+        method: "function approve(address, uint256) returns (bool)",
+        params: [APIConfig.ZSDaddress, banlance],
+      });
+      const tx1Result = await sendAndConfirmTransaction({
+        transaction: tx1,
+        account: account
+      });
+
       const transaction = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTFunds(uint256)",
         params: [toWei(amount)],
       });
+
       // 发送交易并等待用户签名确认
       const result = await sendTransaction(transaction);
-      console.log(result, "-----------", amount);
+      console.log(result, 'resultresultresult')
+
       message.info("您的USDT充值成功");
       formONE.resetFields();
       setUsdtValue("");
@@ -148,7 +160,6 @@ const Commonform = () => {
       // 确保 amount 是字符串格式
       const amountStr = amount.toString();
       try {
-
         //用户的zsd余额
         const ZSDBalance = await readContract({
           contract: ZSD,
@@ -156,11 +167,11 @@ const Commonform = () => {
           params: [account.address],
         });
 
+        // if (ZSDBalance <= 0) {
+        //   message.info("您的ZSD余额不足");
+        //   return;
+        // }
 
-        if (ZSDBalance <= 0) {
-          message.info("您的ZSD余额不足");
-          return;
-        }
         //用户usdt的余额
         const allowanceZSDBalance = await readContract({
           contract: ZSD,
@@ -169,7 +180,6 @@ const Commonform = () => {
         });
 
         const banlance: any = 100000000000000000000000000000 * 10 ** 18;
-
         if (allowanceZSDBalance <= 0) {
           // if (allowanceZSDBalance < banlance) {
           //用户将自己的 zsd转出banlance的权限赋予zsd合约
@@ -259,6 +269,7 @@ const Commonform = () => {
           });
           //用户的zsd余额
           const ZSDBalance = await readContract({
+            // contract: ZSDContract,
             contract: ZSD,
             method: "function balanceOf(address) view returns (uint256)",
             params: [valuesmodal.RechargeAddress],
@@ -288,6 +299,7 @@ const Commonform = () => {
           // }
           // 用户给zsd充值的数量不能超过balance
           const transaction = prepareContractCall({
+            // contract: ZSDContract,
             contract: ZSD,
             method: "function depositUSDTFunds(uint256)",
             params: [toWei(valuesUSDT.USDT_one_SingleCharge)],
@@ -310,10 +322,7 @@ const Commonform = () => {
         // console.log("输入地址：",valuesmodal.RechargeAddress,"输入ZSD：",valuesZSD.usdtInput,"登录账号：",account);
 
         form.resetFields();
-        if (!ZSD) {
-          console.error("Contract is not defined");
-          return;
-        }
+
         try {
           const amountStr = valuesZSD.usdtInput.toString();
           // console.log("输入金额：", amountStr);
@@ -327,12 +336,14 @@ const Commonform = () => {
           });
           //用户的zsd余额
           const ZSDBalance = await readContract({
+            // contract: ZSDContract,
             contract: ZSD,
             method: "function balanceOf(address) view returns (uint256)",
             params: [valuesmodal.RechargeAddress],
           });
           //用户usdt的余额
           const allowanceZSDBalance = await readContract({
+            // contract: ZSDContract,
             contract: ZSD,
             method: "function allowance(address, address)",
             params: [valuesmodal.RechargeAddress, APIConfig.ZSDaddress],
@@ -341,6 +352,7 @@ const Commonform = () => {
           // if (allowanceZSDBalance < banlance) {
           //用户将自己的 zsd转出banlance的权限赋予zsd合约
           const tx2 = prepareContractCall({
+            // contract: ZSDContract,
             contract: ZSD,
             method: "function approve(address, uint256) returns (bool)",
             params: [APIConfig.ZSDaddress, banlance],
@@ -374,13 +386,13 @@ const Commonform = () => {
           // }
 
           // 用户给zsd充值的数量不能超过balance
-          const transaction = prepareContractCall({
-            contract: ZSD,
-            method: "  function depositUSDTANDZSDFunds(uint256) ",
-            params: [toWei(amountStr)],
-          });
+          // const transaction = prepareContractCall({
+          //   contract: ZSDContract,
+          //   method: "  function depositUSDTANDZSDFunds(uint256) ",
+          //   params: [toWei(amountStr)],
+          // });
           // 发送交易并等待用户签名确认(首次需要，第二次不需要)
-          const result = await sendTransaction(transaction);
+          // const result = await sendTransaction(transaction);
 
           message.info("您的ZSD充值成功");
           form.resetFields();
@@ -423,19 +435,15 @@ const Commonform = () => {
   //   if (!value) {
   //     return Promise.resolve();
   //   }
-
   //   // 以太坊地址校验规则
   //   const reg = /^0x[a-fA-F0-9]{40}$/;
-
   //   // 检查输入值是否以 '0x' 开头，如果是，尝试去掉 '0x' 再次校验
   //   const formattedValue = value.replace(/^0x/i, "");
-
   //   // 检查是否通过正则表达式校验
   //   if (!reg.test(formattedValue)) {
   //     // 如果不匹配以太坊地址格式，校验失败
   //     return Promise.reject(new Error("请输入正确的以太坊地址"));
   //   }
-
   //   // 如果匹配，校验通过
   //   return Promise.resolve();
   // };
@@ -461,7 +469,7 @@ const Commonform = () => {
   //   try {
   //     // 调用智能合约的getAmountOut函数
   //     const ZSDamountOut = await readContract({
-  //       contract: ZSD,
+  //       contract: ZSDContract,
   //       method:
   //         "function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut)",
   //       params: [],
@@ -473,14 +481,11 @@ const Commonform = () => {
   // };
 
   useEffect(() => {
-    // ZSDfun();
-
     form.setFieldsValue({
       usdtInput: usdtValue,
       zsdAddress: token,
     });
   }, [form, usdtValue, token]);
-
   return (
     <>
       {/* model1 */}

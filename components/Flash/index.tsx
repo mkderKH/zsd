@@ -175,8 +175,6 @@ const Commonform = () => {
       });
       console.log("USDT transfer successful:", tx1ResultZSDPROJECTContract);
 
-
-
       // 兑换
       const transaction = prepareContractCall({
         contract: ZSDContract,
