@@ -84,7 +84,7 @@ const CallWallet = () => {
 
   const disconnectWallet = async (wallet: any) => {
     try {
-      await wallet.disconnect(); // 假设这里不需要传入参数
+      await wallet.disconnect();
     } catch (error) {
       console.error("Failed to disconnect wallet:", error);
       message.error("登出钱包失败，请稍后重试。");
@@ -233,8 +233,6 @@ const CallWallet = () => {
     const Inviteaddress: any = values.Invitelink
     console.log(Inviteaddress, '======111==========', account);
 
-
-
     try {
       const registerTX = prepareContractCall({
         contract: ZSDContract,
@@ -368,7 +366,6 @@ const CallWallet = () => {
   // };
   return (
     // <div className={inter.className}>
-
     <div>
       <ConnectButton
         theme={"dark"}
