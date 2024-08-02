@@ -5,12 +5,14 @@ import styles from "./index.module.scss";
 import { useRouter } from "next/navigation";
 import { copyToClipboard } from "../../public/clipboard";
 
+
 const RightMenu: React.FC = () => {
   const router = useRouter();
   const handleCopyClick = () => {
-    const textToCopy = "这里是你想要复制的文本1"; // 替换成实际要复制的文本
+    const textToCopy = "这里是你想要复制的文本1";
     copyToClipboard(textToCopy);
   };
+
   return (
     <div className={styles.rightMenu} data-id="RightMenu">
       <div
@@ -67,7 +69,7 @@ const RightMenu: React.FC = () => {
       <div
         data-id="RightMenu"
         className={styles.row}
-        onClick={() => router.push("/images")}
+        onClick={() => router.push("/Community")}
       >
         <Image
           data-id="RightMenu"

@@ -89,12 +89,23 @@ const ClientMenu: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [hideRightMenu]);
+
   return (
     <div className={styles.pageMenu}>
       {isRightMenuVisible && <RightMenu />}
       <Top onToggleRightMenu={toggleRightMenu} />
+
+      <div className={styles.videoBackground} id="nav">
+        <video autoPlay muted loop id="bg-video">
+          <source src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmYHibrfvBUmBhxitkovCGL8kHX2nurtB7TPAkhjLknZM8" type="video/mp4" />
+        </video>
+      </div>
+
       <div className={styles.top} ref={containerRef}>
         {imageArray.map((v, i) => {
+          console.log(v, '===============================', i);
+
+
           if (v.link === "/InCode") {
             return (
               <div

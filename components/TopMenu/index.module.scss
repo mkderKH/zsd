@@ -1,8 +1,8 @@
 .pageMenu {
-  background: url("https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/bgGif.gif")
-    no-repeat;
+  // background: url("https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/bgGif.gif")
+  //   no-repeat;
   // background-size: 101%;
-  background-size: contain;
+  // background-size: contain;
   height: 400px;
   background-position: center;
   position: relative;
@@ -12,32 +12,33 @@
   }
   .menyBtn0 {
     position: absolute;
-    top: 43%;
+    top: 75%;
+    left: 225px;
   }
   .menyBtn1 {
     position: absolute;
-    top: 66%;
-    left: 13%;
+    top: 75%;
+    left: 16%;
   }
   .menyBtn2 {
     position: absolute;
-    left: 22%;
-    top: 24%;
+    left: 30%;
+    top: 55%;
   }
   .menyBtn3 {
     position: absolute;
-    top: 46%;
-    left: 34%;
+    top: 75%;
+    left: 39%;
   }
   .menyBtn4 {
     position: absolute;
-    top: 34%;
-    left: 53%;
+    top: 45%;
+    left: 0%;
   }
   .menyBtn5 {
     position: absolute;
-    right: 3%;
-    bottom: 11%;
+    right: 1%;
+    bottom: 7%;
   }
 
   .menyBtn {
@@ -81,5 +82,21 @@
   .img5 {
     width: 64px;
     height: 64px;
+  }
+  .video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+    padding: 20px;
   }
 }
