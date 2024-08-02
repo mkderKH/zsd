@@ -1,7 +1,6 @@
 export const APIConfig = {
   // USDT合约地址
   USDTaddress: "0xEd650C5D7a5Dc96988Bcc0bD8215807aBb773DB7",
-
   // ZSDABI合约地址
   ZSDaddress: "0x10aee9b5f48c27d0f6cc6ea9a127346be87f49d0",
   // ZSDSwapABI合约地址
