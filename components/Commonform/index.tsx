@@ -126,22 +126,7 @@ const Commonform = () => {
     setIsModalOpen(false);
   };
 
-  // USDTD兑换ZSD
-  const USDtoZSDnumFun = async () => {
-    try {
-      const USDtoZSDnum = await readContract({
-        contract: ZSDSwap,
-        method: "function getAmountZSDOut(uint256) view returns (uint256)",
-        params: [BigInt(1000000000000000000)],
-      });
-      const WeiBalance = USDtoZSDnum.toString();
 
-      SetPrice(WeiBalance)
-      console.log(WeiBalance, "USDtoZSDnum");
-    } catch (error) {
-      console.error("查询失败:", error);
-    }
-  };
 
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
@@ -512,13 +497,26 @@ const Commonform = () => {
   // };
 
   useEffect(() => {
-    USDtoZSDnumFun()
+    // USDTD兑换ZSD
+    const USDtoZSDnumFun = async () => {
+      try {
+        const USDtoZSDnum = await readContract({
+          contract: ZSDSwap,
+          method: "function getAmountZSDOut(uint256) view returns (uint256)",
+          params: [BigInt(1000000000000000000)],
+        });
+        const WeiBalance = USDtoZSDnum.toString();
+        SetPrice(WeiBalance)
+      } catch (error) {
+        console.error("查询失败:", error);
+      }
+    };
 
     form.setFieldsValue({
       usdtInput: usdtValue,
       zsdAddress: token,
     });
-  }, [form, usdtValue, token]);
+  }, [form, usdtValue, token, ZSDSwap]);
   return (
     <>
       {/* model1 */}

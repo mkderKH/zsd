@@ -1,16 +1,3 @@
-// import { message } from 'antd';
-
-// export const copyToClipboard = async (text:string) => {
-//   try {
-//     await navigator.clipboard.writeText(text);
-//     message.success('复制成功');
-//   } catch (err) {
-//     message.error('复制失败，请稍后重试');
-//   }
-// };
-
-
-
 import { message } from 'antd';
 
 // 检测 Clipboard API 是否可用

@@ -87,24 +87,6 @@ const Commonform = () => {
     }
   }, [account]);
 
-  // 查询交易记录
-  // const TransactionRecordFun = async () => {
-  //   const rpcRequest = getRpcClient({ client, chain: bsc });
-  //   const blockNumber = await eth_blockNumber(rpcRequest);
-  //   try {
-  //     const response = await axios.get(
-  //       `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
-  //       //`&topic1=0x000000000000000000000000${storedAccount.address.slice(2)}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
-  //       `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
-  //     );
-
-  //     setTransactionRecord(response.data.result);
-  //     console.log("response:", response.data.result);
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error("请求错误:", error);
-  //   }
-  // }
 
   const onFinish = async (values: any) => {
     try {
@@ -142,7 +124,6 @@ const Commonform = () => {
 
       // 发送交易，交易配置对象直接传递给 sendTransaction
       const result = await sendTransaction(transaction);
-      console.log("提取成功:", result);
     } catch (error) {
       console.error("提取失败:", error);
     }
@@ -159,7 +140,6 @@ const Commonform = () => {
       const WeiBalance = USDtoZSDnum.toString();
 
       SetPrice(WeiBalance)
-      console.log("USDtoZSDnum:", WeiBalance);
     } catch (error) {
       console.error("查询失败:", error);
     }
@@ -222,8 +202,6 @@ const Commonform = () => {
         const computingPowerThird = Number(ComputingPower[3].toString());
         const weiBalanceOne = Number(WeiBalanceone);
         const FinalEffortdata = ((computingPowerSecond + computingPowerThird) / weiBalanceOne) / (10 ** 18)
-
-        console.log('1:', computingPowerSecond, "2:", computingPowerThird, '3:', weiBalanceOne, '++++++++++++++++++++:', FinalEffortdata);
 
         // 最终算力
         setFinalEffort(FinalEffortdata);

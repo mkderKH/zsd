@@ -93,7 +93,6 @@ const Commonform = () => {
       const WeiBalance = USDtoZSDnum.toString();
 
       SetPrice(WeiBalance)
-      console.log(WeiBalance, "USDtoZSDnum");
     } catch (error) {
       console.error("查询失败:", error);
     }
@@ -185,7 +184,6 @@ const Commonform = () => {
       // console.log("USDT transfer successful:", tx1ResultZSDPROJECTContract);
 
 
-      console.log("USDT transfer successful:", values.ZSD_two_amount);
       // 兑换
       const transaction = prepareContractCall({
         contract: ZSDSWAPContract,
@@ -194,7 +192,6 @@ const Commonform = () => {
       });
       const result = await sendTransaction(transaction);
 
-      console.log("Withdrawal successful:", result);
     } catch (error) {
       console.error("Failed to withdraw USDT:", error);
     }
