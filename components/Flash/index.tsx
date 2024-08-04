@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Row, Col, Select } from "antd";
 import {
   createThirdwebClient,
@@ -18,7 +18,7 @@ export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 
 // 导入API配置
 import { APIConfig } from "../../abi/APIConfiguration";
-import { bscTestnet } from "thirdweb/chains";
+import { bsc } from "thirdweb/chains";           //主网
 
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
@@ -30,13 +30,12 @@ const ZSDNewABI: any = ZSDABI;
 const contractwapABI: any = ZSDSwapABI;
 const contractROJECTABI: any = ZSDPROJECTABI;
 
-
 //USDT
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
   abi: USDTAbinew,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 //ZSD
@@ -44,7 +43,7 @@ const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
   abi: ZSDNewABI,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 // ZSDPROJECT
@@ -52,7 +51,7 @@ const ZSDPROJECTContract = getContract({
   client: client,
   address: APIConfig.ZSDPROJECTAddress,
   abi: contractROJECTABI,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 //ZSDSWAP
@@ -60,14 +59,17 @@ const ZSDSWAPContract = getContract({
   client: client,
   address: APIConfig.ZSDSwapAddress,
   abi: contractwapABI,
-  chain: bscTestnet,
+  chain: bsc,
 });
+
 
 const { Option } = Select;
 const Commonform = () => {
   const [form] = Form.useForm();
   const account: any = useActiveAccount();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
+  const [price, SetPrice] = useState<any>(0);
+
 
   const selectAfterone = (
     <Select defaultValue="ZSD" className="select-after">
@@ -81,103 +83,112 @@ const Commonform = () => {
     </Select>
   );
 
-  const onFinish = async (values: any) => {
-    console.log(values.ZSD_two_amount, '===========258===========', account.address)
-    if (!ZSDContract) {
-      console.error("Contract address is not defined");
-      return;
+  const USDtoZSDnumFun = async () => {
+    try {
+      const USDtoZSDnum = await readContract({
+        contract: ZSDSWAPContract,
+        method: "function getAmountZSDOut(uint256) view returns (uint256)",
+        params: [BigInt(1000000000000000000)],
+      });
+      const WeiBalance = USDtoZSDnum.toString();
+
+      SetPrice(WeiBalance)
+      console.log(WeiBalance, "USDtoZSDnum");
+    } catch (error) {
+      console.error("查询失败:", error);
     }
+  };
+
+  const onFinish = async (values: any) => {
     try {
       //*****************************************************ZSD授权USDT**************************************************** */
       //zsd合约有权限调用用户 balance的资产
-      const banlance: any = 10000000000000000000000000 * 10 ** 18;
-      //用户将自己usdt转出banlance的权限赋予zsd合约
-      //用户授权给ZSD合约可操作usdt的余额
-      const allowanceUSDTBalance = await readContract({
-        contract: USDTContract,
-        method: "function allowance(address, address)",
-        params: [account.address, APIConfig.ZSDaddress],
-      });
+      // const banlance: any = 10000000000000000000000000 * 10 ** 18;
 
-      //zsd合约有权限调用用户 balance的资产
-      //用户将自己USDT转出banlance的权限赋予zsd合约
-      const tx1 = prepareContractCall({
-        contract: USDTContract,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDaddress, banlance],
-      });
-      // 用户将usdt转给zsd合约
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account,
-      });
-      console.log("USDT transfer successful:", tx1Result);
+      // //用户将自己usdt转出banlance的权限赋予zsd合约  || 用户授权给ZSD合约可操作usdt的余额
+      // const allowanceUSDTBalance = await readContract({
+      //   contract: USDTContract,
+      //   method: "function allowance(address, address)",
+      //   params: [account.address, APIConfig.ZSDaddress],
+      // });
+
+      // //zsd合约有权限调用用户 balance的资产
+      // //用户将自己USDT转出banlance的权限赋予zsd合约
+      // const tx1 = prepareContractCall({
+      //   contract: USDTContract,
+      //   method: "function approve(address, uint256) returns (bool)",
+      //   params: [APIConfig.ZSDaddress, banlance],
+      // });
+      // // 用户将usdt转给zsd合约
+      // const tx1Result = await sendAndConfirmTransaction({
+      //   transaction: tx1,
+      //   account: account,
+      // });
+      // console.log("USDT transfer successful:", tx1Result);
 
 
       //*****************************************************USDT授权zsd**************************************************** */
-      const banlanceUSDT: any = 10000000000000000000000000 * 10 ** 18;
-      const allowanceUSDTBalanceUSDT = await readContract({
-        contract: ZSDContract,
-        method: "function allowance(address, address)",
-        params: [account.address, APIConfig.USDTaddress],
-      });
-      const tx1usdt = prepareContractCall({
-        contract: ZSDContract,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.USDTaddress, banlanceUSDT],
-      });
-      const tx1Resultusdt = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account,
-      });
-      console.log("USDT transfer successful:", tx1Resultusdt);
-
-
+      // const banlanceUSDT: any = 10000000000000000000000000 * 10 ** 18;
+      // const allowanceUSDTBalanceUSDT = await readContract({
+      //   contract: ZSDContract,
+      //   method: "function allowance(address, address)",
+      //   params: [account.address, APIConfig.USDTaddress],
+      // });
+      // const tx1usdt = prepareContractCall({
+      //   contract: ZSDContract,
+      //   method: "function approve(address, uint256) returns (bool)",
+      //   params: [APIConfig.USDTaddress, banlanceUSDT],
+      // });
+      // const tx1Resultusdt = await sendAndConfirmTransaction({
+      //   transaction: tx1,
+      //   account: account,
+      // });
+      // console.log("USDT transfer successful:", tx1Resultusdt);
 
       //*****************************************************ZSDPROJECT授权zsd**************************************************** */
-      const banlanceZSDPROJECT: any = 10000000000000000000000000 * 10 ** 18;
+      // const banlanceZSDPROJECT: any = 10000000000000000000000000 * 10 ** 18;
 
-      const allowanceUSDTBalanceZSDPROJECT = await readContract({
-        contract: ZSDSWAPContract,
-        method: "function allowance(address, address)",
-        params: [account.address, APIConfig.ZSDSwapAddress],
-      });
+      // const allowanceUSDTBalanceZSDPROJECT = await readContract({
+      //   contract: ZSDSWAPContract,
+      //   method: "function allowance(address, address)",
+      //   params: [account.address, APIConfig.ZSDSwapAddress],
+      // });
 
-      const tx1ZSDPROJECT = prepareContractCall({
-        contract: ZSDSWAPContract,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDSwapAddress, banlanceZSDPROJECT],
-      });
+      // const tx1ZSDPROJECT = prepareContractCall({
+      //   contract: ZSDSWAPContract,
+      //   method: "function approve(address, uint256) returns (bool)",
+      //   params: [APIConfig.ZSDSwapAddress, banlanceZSDPROJECT],
+      // });
 
-      const tx1ResultZSDPROJECT = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account,
-      });
-      console.log("USDT transfer successful:", tx1Resultusdt);
-
-
+      // const tx1ResultZSDPROJECT = await sendAndConfirmTransaction({
+      //   transaction: tx1,
+      //   account: account,
+      // });
+      // console.log("USDT transfer successful:", tx1Resultusdt);
 
       //*****************************************************ZSDPROJECT授权zsd**************************************************** */
-      const banlanceZSDPROJECTContract: any = 10000000000000000000000000 * 10 ** 18;
-      const allowanceUSDTBalanceZSDPROJECTContract = await readContract({
-        contract: ZSDSWAPContract,
-        method: "function allowance(address, address)",
-        params: [account.address, APIConfig.ZSDPROJECTAddress],
-      });
-      const tx1ZSDZSDPROJECTContract = prepareContractCall({
-        contract: ZSDSWAPContract,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDPROJECTAddress, banlanceZSDPROJECTContract],
-      });
-      const tx1ResultZSDPROJECTContract = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account,
-      });
-      console.log("USDT transfer successful:", tx1ResultZSDPROJECTContract);
+      // const banlanceZSDPROJECTContract: any = 10000000000000000000000000 * 10 ** 18;
+      // const allowanceUSDTBalanceZSDPROJECTContract = await readContract({
+      //   contract: ZSDSWAPContract,
+      //   method: "function allowance(address, address)",
+      //   params: [account.address, APIConfig.ZSDPROJECTAddress],
+      // });
+      // const tx1ZSDZSDPROJECTContract = prepareContractCall({
+      //   contract: ZSDSWAPContract,
+      //   method: "function approve(address, uint256) returns (bool)",
+      //   params: [APIConfig.ZSDPROJECTAddress, banlanceZSDPROJECTContract],
+      // });
+      // const tx1ResultZSDPROJECTContract = await sendAndConfirmTransaction({
+      //   transaction: tx1,
+      //   account: account,
+      // });
+      // console.log("USDT transfer successful:", tx1ResultZSDPROJECTContract);
 
+
+      console.log("USDT transfer successful:", values.ZSD_two_amount);
       // 兑换
       const transaction = prepareContractCall({
-        contract: ZSDContract,
+        contract: ZSDSWAPContract,
         method: "function zsdtTokenTousdtTokenSwap(uint256 amountzsdtToken)",
         params: [toWei(values.ZSD_two_amount)],
       });
@@ -202,6 +213,9 @@ const Commonform = () => {
     return Promise.resolve();
   };
 
+  useEffect(() => {
+    USDtoZSDnumFun()
+  }, []);
   return (
     <>
       <div className={styles.Content}>
@@ -230,6 +244,12 @@ const Commonform = () => {
                   addonAfter={selectAfterone}
                   placeholder="请输入数量"
                   className={styles.inputstyle}
+                  onChange={(e: any) => {
+                    const tokenValue = (e.target.value) / price * 10 ** 18;
+                    form.setFieldsValue({
+                      ZSD_two_amount: tokenValue,
+                    });
+                  }}
                 />
               </Form.Item>
             </Col>
@@ -237,15 +257,11 @@ const Commonform = () => {
               <Form.Item
                 colon={false}
                 name="ZSD_two_amount"
-                rules={[
-                  { required: true, message: "请输入充入金额!" },
-                  { validator: amountValidator },
-                ]}
               >
                 <Input
                   addonAfter={selectAftertwo}
-                  placeholder="请输入数量"
                   className={styles.inputstyle}
+                  disabled
                 />
               </Form.Item>
             </Col>

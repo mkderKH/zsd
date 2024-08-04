@@ -7,11 +7,13 @@ import {
   toWei,
   readContract,
   sendAndConfirmTransaction,
+  toEther,
 } from "thirdweb";
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { Button, Form, Input, Row, Col, Modal, message } from "antd";
 import { approve, balanceOf } from "thirdweb/extensions/erc20";
-import { bscTestnet } from "thirdweb/chains";
+// import { bscTestnet } from "thirdweb/chains";  //测试网
+import { bsc } from "thirdweb/chains"; //主网
 import { APIConfig } from "../../abi/APIConfiguration";
 
 import { USDTAbi } from "../../abi/USDTAbi";//USDTABI
@@ -40,12 +42,16 @@ const Commonform = () => {
   const [formONE] = Form.useForm();
   const [form] = Form.useForm();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
+  const [price, SetPrice] = useState<any>();
+  const [uSDTprice, setUSDTprice] = useState<any>(0);
+  const [zsdprice, setZsdprice] = useState<any>(0);
+
 
   //USDT
   const USDT = getContract({
     client: client,
     address: APIConfig.USDTaddress,
-    chain: bscTestnet,
+    chain: bsc,
   });
 
   //用户必须已经授权本合约从USDT合约划转账务
@@ -53,21 +59,21 @@ const Commonform = () => {
     client: client,
     address: APIConfig.ZSDaddress,
     abi: contractZSDABI,
-    chain: bscTestnet,
+    chain: bsc,
   });
 
   const ZSDProjectContract = getContract({
     client: client,
     address: APIConfig.ZSDPROJECTAddress,
     abi: contractZSDPROJECTABI,
-    chain: bscTestnet,
+    chain: bsc,
   });
 
   const ZSDSwap = getContract({
     client: client,
     address: APIConfig.ZSDSwapAddress,
     abi: contractZSDSwapABI,
-    chain: bscTestnet,
+    chain: bsc,
   });
   const handleUsdtChange = (value: any) => {
     // 重置表单
@@ -95,9 +101,10 @@ const Commonform = () => {
       return;
     }
     const zsdCalculated = Number(((numberValue * 7) / 3).toFixed(2));
+
     setUsdtValue(trimmedValue);
     setZsdValue(zsdCalculated);
-    const tokenValue = zsdCalculated / 0.1;
+    const tokenValue = zsdCalculated * price / 10 ** 18;
     setToken(tokenValue);
     form.setFieldsValue({ zsdAddress: tokenValue });
   };
@@ -119,8 +126,27 @@ const Commonform = () => {
     setIsModalOpen(false);
   };
 
+  // USDTD兑换ZSD
+  const USDtoZSDnumFun = async () => {
+    try {
+      const USDtoZSDnum = await readContract({
+        contract: ZSDSwap,
+        method: "function getAmountZSDOut(uint256) view returns (uint256)",
+        params: [BigInt(1000000000000000000)],
+      });
+      const WeiBalance = USDtoZSDnum.toString();
+
+      SetPrice(WeiBalance)
+      console.log(WeiBalance, "USDtoZSDnum");
+    } catch (error) {
+      console.error("查询失败:", error);
+    }
+  };
+
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
+    setUSDTprice(amount)
+
     try {
       const banlance: any = 10000000000000000000000000 * 10 ** 18;
       const tx1 = prepareContractCall({
@@ -139,9 +165,9 @@ const Commonform = () => {
         params: [toWei(amount)],
       });
 
-      // 发送交易并等待用户签名确认
-      const result = await sendTransaction(transaction);
-      console.log(result, 'resultresultresult')
+      // // 发送交易并等待用户签名确认
+      // const result = await sendTransaction(transaction);
+      // console.log(result, 'resultresultresult')
 
       message.info("您的USDT充值成功");
       formONE.resetFields();
@@ -156,6 +182,9 @@ const Commonform = () => {
 
   // 充值ZSD
   async function depositZSDFunds(amount: any) {
+    // const amountnum: any = price * amount;
+    // console.log(amount, "amount++++++++++++++++");
+
     try {
       // 确保 amount 是字符串格式
       const amountStr = amount.toString();
@@ -171,6 +200,7 @@ const Commonform = () => {
         //   message.info("您的ZSD余额不足");
         //   return;
         // }
+
 
         //用户usdt的余额
         const allowanceZSDBalance = await readContract({
@@ -424,6 +454,7 @@ const Commonform = () => {
         console.error("处理充值请求时发生错误:", error);
       }
     } else if (values.zsdAddress) {
+      setZsdprice(values.usdtInput)
       // 充值ZSD
       await depositZSDFunds(values.zsdAddress);
     }
@@ -481,6 +512,8 @@ const Commonform = () => {
   // };
 
   useEffect(() => {
+    USDtoZSDnumFun()
+
     form.setFieldsValue({
       usdtInput: usdtValue,
       zsdAddress: token,
@@ -501,7 +534,7 @@ const Commonform = () => {
         >
           <Row>
             <Col span={24}>
-              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：2540</span></div>
+              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：{uSDTprice * 2}</span></div>
             </Col>
             <Col span={24}>
               <Form.Item
@@ -573,11 +606,10 @@ const Commonform = () => {
         >
           <Row>
             <Col span={24}>
-              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：1020</span></div>
+              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：{(zsdprice * 2) + (zsdprice / 3 * 7) * 3}</span></div>
             </Col>
             <Col span={24}>
               <Form.Item
-                // label={<span className={styles.Contentlabel}>USDT</span>}
                 colon={false}
                 name="usdtInput"
                 initialValue={usdtValue}
@@ -599,9 +631,9 @@ const Commonform = () => {
           <Row>
             <Col span={24}>
               <div className={styles.labelContainer}>
-                <span className={styles.labelLeft}>币</span>
+                <span className={styles.labelLeft}>ZSD</span>
                 {/* 当前zsd的价格 */}
-                <span className={styles.labelRight}>ZSD: 0.1</span>
+                <span className={styles.labelRight}>ZSD: {price / 10 ** 18}</span>
               </div>
             </Col>
           </Row>
@@ -620,7 +652,7 @@ const Commonform = () => {
           <Row style={{ marginBottom: "20px" }}>
             <Col span={24}>
               <span className={styles.CalculatedValue}>
-                USDT+币：
+                USDT+ZSD：
                 {parseFloat(usdtValue || 0) + parseFloat(zsdValue || 0)}
               </span>
               <span className={styles.Ustyle}>U</span>

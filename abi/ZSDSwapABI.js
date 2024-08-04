@@ -1,37 +1,13 @@
 export const ZSDSwapABI = [
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_zsdtToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_usdtToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "admin",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "_zsdtToken", type: "address" }],
     stateMutability: "nonpayable",
     type: "constructor",
   },
   {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "amountusdtToken",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "amountzsdtToken",
-        type: "uint256",
-      },
+      { internalType: "uint256", name: "amountusdtToken", type: "uint256" },
+      { internalType: "uint256", name: "amountzsdtToken", type: "uint256" },
     ],
     name: "addLiquidity",
     outputs: [],
@@ -39,74 +15,46 @@ export const ZSDSwapABI = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_user",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "_user", type: "address" }],
     name: "addToWhitelist",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
+    inputs: [{ internalType: "uint256", name: "usdtAmount", type: "uint256" }],
+    name: "addUSDT",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "amountIn",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "reserveIn",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "reserveOut",
-        type: "uint256",
-      },
+      { internalType: "uint256", name: "amountIn", type: "uint256" },
+      { internalType: "uint256", name: "reserveIn", type: "uint256" },
+      { internalType: "uint256", name: "reserveOut", type: "uint256" },
     ],
     name: "getAmountOut",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "pure",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "usdtAmount",
-        type: "uint256",
-      },
-    ],
+    inputs: [{ internalType: "uint256", name: "usdtAmount", type: "uint256" }],
     name: "getAmountZSDOut",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_user",
-        type: "address",
-      },
-    ],
+    inputs: [],
+    name: "projectUSDTPool",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "_user", type: "address" }],
     name: "removeFromWhitelist",
     outputs: [],
     stateMutability: "nonpayable",
@@ -114,11 +62,7 @@ export const ZSDSwapABI = [
   },
   {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "amountusdtToken",
-        type: "uint256",
-      },
+      { internalType: "uint256", name: "amountusdtToken", type: "uint256" },
     ],
     name: "removeLiquidity",
     outputs: [],
@@ -128,23 +72,13 @@ export const ZSDSwapABI = [
   {
     inputs: [],
     name: "usdtReserve",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "amountusdtToken",
-        type: "uint256",
-      },
+      { internalType: "uint256", name: "amountusdtToken", type: "uint256" },
     ],
     name: "usdtTokenTozsdtTokenSwap",
     outputs: [],
@@ -152,44 +86,22 @@ export const ZSDSwapABI = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "", type: "address" }],
     name: "whitelist",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
     name: "zsdReserve",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "amountzsdtToken",
-        type: "uint256",
-      },
+      { internalType: "uint256", name: "amountzsdtToken", type: "uint256" },
     ],
     name: "zsdtTokenTousdtTokenSwap",
     outputs: [],

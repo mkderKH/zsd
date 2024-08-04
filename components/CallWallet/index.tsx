@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { message, Modal, Input, Form, Button, Row, Col } from "antd";
 import { createWallet, walletConnect } from "thirdweb/wallets";
 import { ConnectButton } from "thirdweb/react";
-import { bscTestnet } from "thirdweb/chains";
+// import { bscTestnet } from "thirdweb/chains"; //测试网
+import { bsc } from "thirdweb/chains";           //主网
 import { client } from "../../src/app/client";
 // import { Inter } from "next/font/google";
 import type { Metadata } from "next";
@@ -44,7 +45,7 @@ const wallets: any = [
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractABI
 });
 
@@ -52,7 +53,7 @@ const ZSDContract = getContract({
 const USDT = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractABI,
 });
 
@@ -61,14 +62,14 @@ const ZSD = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
   abi: contractZSDABI,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 // ZSDProject
 const ZSDProjectfun = getContract({
   client: client,
   address: APIConfig.ZSDPROJECTAddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractZSDPROJECTABI,
 });
 
@@ -114,8 +115,8 @@ const CallWallet = () => {
     try {
       // 使用 Promise.all 来并行处理所有钱包的登出
       await Promise.all(wallets.map(disconnectWallet));
-      message.error("未填写邀请码，钱包已登出");
       setIsModalOpen(false);
+      message.info("未填写邀请码，钱包已登出");
     } catch (error) {
       // 如果任何一个钱包登出失败，捕获错误并显示消息
       message.error("登出钱包失败，请重试。");
@@ -124,17 +125,15 @@ const CallWallet = () => {
 
   // 判断用户是否登录
   const WhetherInviteUsers = async () => {
-    console.log(account, "是否登录111111111111111111111111111111111111111");
-
     if (!account) {
       message.error("请登录");
       return;
     }
-
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const Inviteaddress: any = params.get("ref");
-    console.log(account.address, "邀请人地址:", Inviteaddress);
+
+    console.log("邀请人地址登录:", Inviteaddress);
     try {
       // 查询是否已注册
       const registerTX = prepareContractCall({
@@ -157,7 +156,6 @@ const CallWallet = () => {
         params: [account.address],
       });
       console.log("USDT余额:", USDTBalance);
-
 
       // if (USDTBalance == 0) {
       //   message.info("USDT余额为0，请充值USDT");
@@ -230,9 +228,14 @@ const CallWallet = () => {
   // 输入邀请链接
   const onFriendRechargeFun = async () => {
     const values = form.getFieldsValue();
-    const Inviteaddress: any = values.Invitelink
-    console.log(Inviteaddress, '======111==========', account);
+    const Inviteaddress: any = values.Invitelink.split(' ').join('')
 
+    // const values = form.getFieldsValue();
+    // const search = values.Invitelink;
+    // const params = new URLSearchParams(new URL(search).search);
+    // const Inviteaddress: any = params.get('ref');
+
+    console.log("邀请人地址填写:", Inviteaddress);
     try {
       const registerTX = prepareContractCall({
         contract: ZSDContract,
@@ -372,11 +375,11 @@ const CallWallet = () => {
         client={client}
         wallets={wallets}
         connectModal={{ size: "compact" }}
-        chain={bscTestnet}
+        chain={bsc}
       />
 
       {
-        account &&
+        // account &&
         <Modal
           title=""
           open={isModalOpen}

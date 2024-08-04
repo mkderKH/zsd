@@ -13,6 +13,7 @@
   .inputstyle {
     background: #d8d8d8;
     border-radius: 4px;
+    color: #ffffff;
     line-height: 25px;
   }
   .buttonstyle {
@@ -21,7 +22,7 @@
     background: #e89e2c;
     // opacity: 0.8;
     backdrop-filter: blur(2px);
-    // font-family: "PingFang-SC, PingFang-SC";
+
     font-weight: 500;
     font-size: 18px;
     color: #ffffff;
@@ -43,7 +44,6 @@
   }
   .ContentText {
     text-align: center;
-    // font-family: "PingFang-SC, PingFang-SC";
     font-weight: 600;
     font-size: 20px;
     color: #ffffff;
@@ -51,9 +51,9 @@
     text-align: center;
     font-style: normal;
     border-bottom: 3px solid #e89e2c;
+    margin-bottom: 20px;
   }
   .ContentInstructions {
-    // font-family: "PingFang-SC, PingFang-SC";
     font-weight: 400;
     font-size: 14px;
     color: #ffffff;
@@ -64,7 +64,6 @@
     margin-top: 8px;
   }
   .Contentlabel {
-    // font-family: "PingFang-SC, PingFang-SC";
     font-weight: 500;
     font-size: 16px;
     color: #ffffff;
@@ -79,7 +78,7 @@
   }
   .labelLeft {
     margin-right: auto;
-    // font-family: "PingFang-SC, PingFang-SC";
+
     font-weight: 500;
     font-size: 16px;
     color: #ffffff;
@@ -89,7 +88,7 @@
   }
   .labelRight {
     margin-left: auto;
-    // font-family: "PingFang-SC, PingFang-SC";
+
     font-weight: 400;
     font-size: 14px;
     color: #999999;
@@ -98,7 +97,6 @@
     font-style: normal;
   }
   .CalculatedValue {
-    // font-family: "PingFang-SC, PingFang-SC";
     font-weight: 500;
     font-size: 28px;
     color: #e89e2c;
@@ -107,7 +105,6 @@
     font-style: normal;
   }
   .Ustyle {
-    // font-family: "PingFang-SC, PingFang-SC";
     font-weight: 500;
     font-size: 16px;
     color: #ffffff;

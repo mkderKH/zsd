@@ -2,53 +2,84 @@
 import React, { useState, useEffect } from "react";
 import {
   getContract,
-  createThirdwebClient,
   readContract,
   prepareContractCall,
+  createThirdwebClient,
   sendAndConfirmTransaction,
+  prepareEvent,
+  getContractEvents,
 } from "thirdweb";
+
 import { Button, Form, Input, Row, Col } from "antd";
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { approve, balanceOf } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
+import axios from "axios";
 
-// 初始化
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
-
-// 导入API配置
 import { APIConfig } from "../../abi/APIConfiguration";
-import { bscTestnet } from "thirdweb/chains";
 import { USDTAbi } from "../../abi/USDTAbi";
-
-// 导入合约abi
+import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
+import { ZSDABI } from "../../abi/ZSDABI";
+import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
+import { getRpcClient, eth_blockNumber, eth_getLogs } from "thirdweb/rpc";
+import { bsc } from "thirdweb/chains";
 const contractABI: any = USDTAbi;
+const ZSDContractABI: any = ZSDPROJECTABI;
+const contractZSDSwapABI: any = ZSDSwapABI;
+const contractZSD: any = ZSDABI
+
 
 //USDT
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bscTestnet,
+  chain: bsc,
+});
+
+// ZSD
+const contractZSDabi = getContract({
+  client: client,
+  address: APIConfig.ZSDaddress,
+  chain: bsc,
+  abi: contractZSD
 });
 
 //用户必须已经授权本合约从USDT合约划转账务
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractABI,
+});
+
+const ZSDContractPoject = getContract({
+  client: client,
+  address: APIConfig.ZSDPROJECTAddress,
+  chain: bsc,
+  abi: ZSDContractABI,
+});
+
+const ZSDSwap = getContract({
+  client: client,
+  address: APIConfig.ZSDSwapAddress,
+  abi: contractZSDSwapABI,
+  chain: bsc,
 });
 
 const Commonform = () => {
   const [form] = Form.useForm();
-  const account = useActiveAccount(); // 获取当前激活的账户
-  const [uSDTBalance, setUSDTBalance] = useState<any>();
+  const account = useActiveAccount();
   const [zSDBalance, setZSDBalance] = useState<any>();
+  const [uSDTBalance, setUSDTBalance] = useState<any>();
   const [Finaleffort, setFinalEffort] = useState<any>();
   const [FinaleffortZSD, setFinalEffortZSD] = useState<any>();
+  const [storedAccount, setStoredAccount] = useState<any>(null);
   const [directNumberPeople, setDirectNumberPeople] = useState<any>();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
-  const [storedAccount, setStoredAccount] = useState<any>(null);
+  const [price, SetPrice] = useState<any>();
+  const [transactionRecord, setTransactionRecord] = useState<any>([]);
 
   useEffect(() => {
     if (account) {
@@ -56,16 +87,30 @@ const Commonform = () => {
     }
   }, [account]);
 
-  const onFinish = async (values: any) => {
-    // console.log(storedAccount, "storedAccount");
+  // 查询交易记录
+  // const TransactionRecordFun = async () => {
+  //   const rpcRequest = getRpcClient({ client, chain: bsc });
+  //   const blockNumber = await eth_blockNumber(rpcRequest);
+  //   try {
+  //     const response = await axios.get(
+  //       `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
+  //       //`&topic1=0x000000000000000000000000${storedAccount.address.slice(2)}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+  //       `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+  //     );
 
-    if (!ZSDContract) {
-      console.error("Contract or account is not defined");
-      return;
-    }
+  //     setTransactionRecord(response.data.result);
+  //     console.log("response:", response.data.result);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("请求错误:", error);
+  //   }
+  // }
+
+  const onFinish = async (values: any) => {
     try {
       //zsd合约有权限调用用户 balance的资产
       const banlance: any = 10000000000000000000000000 * 10 ** 18;
+
       //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
       //用户授权给ZSD合约可操作usdt的余额
       const allowanceUSDTBalance = await readContract({
@@ -74,7 +119,6 @@ const Commonform = () => {
         params: [storedAccount.address, APIConfig.ZSDaddress],
       });
 
-      // if (allowanceUSDTBalance < toWei(amount).valueOf()) {
       //zsd合约有权限调用用户 balance的资产
       //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
       const tx1 = prepareContractCall({
@@ -89,26 +133,42 @@ const Commonform = () => {
       });
 
       const transaction = prepareContractCall({
-        contract: ZSDContract,
+        contract: ZSDContractPoject,
         // method: "function withdraZSDFunds(uint256 zsdAmount)",
         method: "withdraZSDFunds",
         // params: [Finaleffort],
         params: [], // 移除参数
       });
+
       // 发送交易，交易配置对象直接传递给 sendTransaction
       const result = await sendTransaction(transaction);
-      // console.log("提取成功:", result);
+      console.log("提取成功:", result);
     } catch (error) {
       console.error("提取失败:", error);
     }
   };
 
+  // USDTD兑换ZSD
+  const USDtoZSDnumFun = async () => {
+    try {
+      const USDtoZSDnum = await readContract({
+        contract: ZSDSwap,
+        method: "function getAmountZSDOut(uint256) view returns (uint256)",
+        params: [BigInt(1000000000000000000)],
+      });
+      const WeiBalance = USDtoZSDnum.toString();
+
+      SetPrice(WeiBalance)
+      console.log("USDtoZSDnum:", WeiBalance);
+    } catch (error) {
+      console.error("查询失败:", error);
+    }
+  };
+
   useEffect(() => {
+    USDtoZSDnumFun()
+
     const depositFunds = async () => {
-      if (!ZSDContract || !storedAccount) {
-        console.error("Contract is not defined");
-        return;
-      }
       try {
         // *************************************************************************查询用户USDT余额*****************************************************************************
         //用户usdt的余额
@@ -124,13 +184,7 @@ const Commonform = () => {
         // 判断余额是否为0
         const Compareone = parseFloat(usdtBalance.toString());
         // 将 BigInt 转换为常规数字并保留两位小数
-        const formattedBalance =
-          Compareone == 0
-            ? Compareone
-            : (
-                parseFloat(usdtBalance.toString()) /
-                10 ** USDT_DECIMALS
-              ).toFixed(2);
+        const formattedBalance = Compareone == 0 ? Compareone : (parseFloat(usdtBalance.toString()) / 10 ** USDT_DECIMALS).toFixed(2);
 
         //用户zsd余额
         const ZSDBalance = await readContract({
@@ -146,50 +200,37 @@ const Commonform = () => {
         // 判断余额是否为0
         const Compare = parseFloat(usdtBalancetwo.toString());
         // 将 BigInt 转换为常规数字并保留两位小数
-        const formattedBalancetwo =
-          Compare == 0
-            ? Compare
-            : (
-                parseFloat(usdtBalancetwo.toString()) /
-                10 ** USDT_DECIMALStwo
-              ).toFixed(2);
+        const formattedBalancetwo = Compare == 0 ? Compare : (parseFloat(usdtBalancetwo.toString()) / 10 ** USDT_DECIMALStwo).toFixed(2);
         setUSDTBalance(formattedBalance);
         setZSDBalance(formattedBalancetwo);
-        // *************************************************************************查询代币*****************************************************************************
-        const ComputingPower = await readContract({
-          contract: ZSDContract,
-          method: "users",
-          params: [storedAccount.address],
+
+
+        const USDtoZSDnum = await readContract({
+          contract: ZSDSwap,
+          method: "function getAmountZSDOut(uint256) view returns (uint256)",
+          params: [BigInt(1000000000000000000)],
         });
-        // console.log("返回:", ComputingPower);
-        const FinalEffortdata = ComputingPower[2] + ComputingPower[3];
-        const FinalEffortdataOne = BigInt(FinalEffortdata.toString());
-        const USDT_DECIMALSOnt = 6;
-        const usdtBalanceone =
-          FinalEffortdataOne / BigInt(10 ** (18 - USDT_DECIMALSOnt));
-        const FinalEffort = parseFloat(usdtBalanceone.toString());
-        const FinalPower =
-          FinalEffort == 0
-            ? FinalEffort
-            : (
-                parseFloat(usdtBalanceone.toString()) /
-                10 ** USDT_DECIMALSOnt
-              ).toFixed(2);
+        const WeiBalanceone: any = USDtoZSDnum.toString();
+
+        // *************************************************************************查询个人中心*****************************************************************************
+        const ComputingPower = await readContract({
+          contract: ZSDContractPoject,
+          method: "users",
+          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
+        });
+        const computingPowerSecond = Number(ComputingPower[2].toString());
+        const computingPowerThird = Number(ComputingPower[3].toString());
+        const weiBalanceOne = Number(WeiBalanceone);
+        const FinalEffortdata = ((computingPowerSecond + computingPowerThird) / weiBalanceOne) / (10 ** 18)
+
+        console.log('1:', computingPowerSecond, "2:", computingPowerThird, '3:', weiBalanceOne, '++++++++++++++++++++:', FinalEffortdata);
+
         // 最终算力
-        setFinalEffort(FinalPower);
+        setFinalEffort(FinalEffortdata);
         // ZSD
-        setFinalEffortZSD(ComputingPower[3].toString());
+        // setFinalEffortZSD(FinalEffortdata2);
         // 直推人数
         setDirectNumberPeople(ComputingPower[1].toString());
-        // 时间
-        // const lastActionTimeSeconds = ComputingPower[5].toString();
-        // console.log(lastActionTimeSeconds, '============================');
-        // const timestampNumber = Number(lastActionTimeSeconds);
-        // const date = new Date(timestampNumber * 1000); // Date 需要毫秒为单位
-        // console.log(date.toLocaleString());
-        // const lastActionTimeDate = new Date(lastActionTimeSeconds * 1000);
-        // console.log(lastActionTimeDate.toString()); // 输出格式化的日期和时间字符串
-        // console.log(lastActionTimeDate.toISOString()); // 输出 ISO 格式的日期和时间字符串
       } catch (error) {
         console.error("查询余额失败:", error);
       }
@@ -199,103 +240,6 @@ const Commonform = () => {
     }
   }, [storedAccount]);
 
-  // useEffect(() => {
-  //   const depositFunds = async () => {
-  //     if (!ZSDContract || !storedAccount) {
-  //       console.error("Contract is not defined");
-  //       return;
-  //     }
-  //     try {
-  //       // *************************************************************************查询用户USDT余额*****************************************************************************
-  //       //用户usdt的余额
-  //       const USDTBalance = await readContract({
-  //         contract: USDTContract,
-  //         method: "function balanceOf(address) view returns (uint256)",
-  //         params: [storedAccount.address],
-  //       });
-  //       const WeiBalance = BigInt(USDTBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
-  //       const USDT_DECIMALS = 6; // 假设 USDT 的小数精度为 6
-  //       // 将 Wei 转换为 USDT 单位
-  //       const usdtBalance = WeiBalance / BigInt(10 ** (18 - USDT_DECIMALS));
-  //       // 判断余额是否为0
-  //       const Compareone = parseFloat(usdtBalance.toString());
-  //       // 将 BigInt 转换为常规数字并保留两位小数
-  //       const formattedBalance =
-  //         Compareone == 0
-  //           ? Compareone
-  //           : (
-  //               parseFloat(usdtBalance.toString()) /
-  //               10 ** USDT_DECIMALS
-  //             ).toFixed(2);
-
-  //       //用户zsd余额
-  //       const ZSDBalance = await readContract({
-  //         contract: ZSDContract,
-  //         method: "function balanceOf(address) view returns (uint256)",
-  //         params: [storedAccount.address],
-  //       });
-  //       const WeiBalancetwo = BigInt(ZSDBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
-  //       const USDT_DECIMALStwo = 6; // 假设 USDT 的小数精度为 6
-  //       // 将 Wei 转换为 USDT 单位
-  //       const usdtBalancetwo =
-  //         WeiBalancetwo / BigInt(10 ** (18 - USDT_DECIMALStwo));
-  //       // 判断余额是否为0
-  //       const Compare = parseFloat(usdtBalancetwo.toString());
-  //       // 将 BigInt 转换为常规数字并保留两位小数
-  //       const formattedBalancetwo =
-  //         Compare == 0
-  //           ? Compare
-  //           : (
-  //               parseFloat(usdtBalancetwo.toString()) /
-  //               10 ** USDT_DECIMALStwo
-  //             ).toFixed(2);
-  //       setUSDTBalance(formattedBalance);
-  //       setZSDBalance(formattedBalancetwo);
-
-  //       // *************************************************************************查询代币*****************************************************************************
-  //       const ComputingPower = await readContract({
-  //         contract: ZSDContract,
-  //         method: "users",
-  //         params: [storedAccount.address],
-  //       });
-  //       // console.log("返回:", ComputingPower);
-
-  //       const FinalEffortdata = ComputingPower[2] + ComputingPower[3];
-  //       const FinalEffortdataOne = BigInt(FinalEffortdata.toString());
-  //       const USDT_DECIMALSOnt = 6;
-  //       const usdtBalanceone =
-  //         FinalEffortdataOne / BigInt(10 ** (18 - USDT_DECIMALSOnt));
-  //       const FinalEffort = parseFloat(usdtBalanceone.toString());
-  //       const FinalPower =
-  //         FinalEffort == 0
-  //           ? FinalEffort
-  //           : (
-  //               parseFloat(usdtBalanceone.toString()) /
-  //               10 ** USDT_DECIMALSOnt
-  //             ).toFixed(2);
-
-  //       // 最终算力
-  //       setFinalEffort(FinalPower);
-  //       // ZSD
-  //       setFinalEffortZSD(ComputingPower[3].toString());
-  //       // 直推人数
-  //       setDirectNumberPeople(ComputingPower[1].toString());
-
-  //       // 时间
-  //       // const lastActionTimeSeconds = ComputingPower[5].toString();
-  //       // console.log(lastActionTimeSeconds, '============================');
-  //       // const timestampNumber = Number(lastActionTimeSeconds);
-  //       // const date = new Date(timestampNumber * 1000); // Date 需要毫秒为单位
-  //       // console.log(date.toLocaleString());
-  //       // const lastActionTimeDate = new Date(lastActionTimeSeconds * 1000);
-  //       // console.log(lastActionTimeDate.toString()); // 输出格式化的日期和时间字符串
-  //       // console.log(lastActionTimeDate.toISOString()); // 输出 ISO 格式的日期和时间字符串
-  //     } catch (error) {
-  //       console.error("查询余额失败:", error);
-  //     }
-  //   };
-  //   depositFunds();
-  // }, []);
   return (
     <>
       <div className={styles.Content}>
@@ -332,7 +276,6 @@ const Commonform = () => {
             <Col span={24}>
               <div className={styles.labelContainer}>
                 <span className={styles.labelLeft}>我的总算力</span>
-                {/* <span className={styles.labelRight}>已提取总额</span> */}
               </div>
             </Col>
           </Row>
@@ -347,14 +290,8 @@ const Commonform = () => {
                 />
               </Form.Item>
             </Col>
-            {/* <Col span={2}> </Col>
-            <Col span={11}>
-              <Form.Item colon={false} name="USDT_two_amount">
-                <Input className={styles.inputstyle} disabled />
-              </Form.Item>
-            </Col> */}
           </Row>
-          <Row>
+          {/* <Row>
             <Col span={24}>
               <Form.Item colon={false} name="USDT_two_ZSD">
                 <Input
@@ -365,11 +302,11 @@ const Commonform = () => {
                 />
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
           <Row>
             <Col span={24} className={styles.cost}>
               <span className={styles.CalculatedValue}>
-                当前ZSD价值 1ZSD=0.5USDT
+                当前ZSD价值 1USDT={price / 10 ** 18}ZSD
               </span>
             </Col>
           </Row>
@@ -395,10 +332,6 @@ const Commonform = () => {
           <div className={styles.currencyrow}>
             <div className={styles.NumberPeoplestyle}>{directNumberPeople}</div>
             <div className={styles.NumberPeople}>直推人数</div>
-          </div>
-          <div className={styles.currencyrow}>
-            <div className={styles.NumberPeoplestyle}>0</div>
-            <div className={styles.NumberPeople}>团队人数</div>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ const TopMenu = dynamic(() => import("../../../components/TopMenu"), {
   ssr: true,
 });
 import IndividualCenter from "../../../components/IndividualCenter";
+import TransactionRecord from "../../../components/TransactionRecord";
 import { MenuProvider } from "../../../components/MenuContext";
 
 const Personal = () => {
@@ -11,6 +12,7 @@ const Personal = () => {
     <MenuProvider>
       <TopMenu />
       <IndividualCenter />
+      <TransactionRecord />
     </MenuProvider>
   );
 };

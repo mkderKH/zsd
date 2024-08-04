@@ -123,9 +123,10 @@
     width: 100%;
     margin-top: 23px;
     padding: 0px 30px;
-    display: flex; /* 使用flex布局 */
-    justify-content: space-between; /* 子元素分布在容器内，两端对齐，中间间隔均匀 */
-    align-items: flex-start; /* 子元素在交叉轴上向起始位置对齐 */
+    text-align: center;
+    // display: flex; /* 使用flex布局 */
+    // justify-content: space-between; /* 子元素分布在容器内，两端对齐，中间间隔均匀 */
+    // align-items: flex-start; /* 子元素在交叉轴上向起始位置对齐 */
   }
   .currencyrow {
     width: 50%;
