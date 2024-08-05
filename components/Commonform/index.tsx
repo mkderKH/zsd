@@ -76,6 +76,9 @@ const Commonform = () => {
     chain: bsc,
   });
   const handleUsdtChange = (value: any) => {
+    setZsdprice(value) //实时计算算力
+
+
     // 重置表单
     formONE.resetFields();
     // 异步更新状态
@@ -130,8 +133,6 @@ const Commonform = () => {
 
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
-    setUSDTprice(amount)
-
     try {
       const banlance: any = 10000000000000000000000000 * 10 ** 18;
       const tx1 = prepareContractCall({
@@ -439,7 +440,7 @@ const Commonform = () => {
         console.error("处理充值请求时发生错误:", error);
       }
     } else if (values.zsdAddress) {
-      setZsdprice(values.usdtInput)
+
       // 充值ZSD
       await depositZSDFunds(values.zsdAddress);
     }
@@ -496,21 +497,23 @@ const Commonform = () => {
   //   }
   // };
 
+  // USDTD兑换ZSD
+  const USDtoZSDnumFun = async () => {
+    try {
+      const USDtoZSDnum = await readContract({
+        contract: ZSDSwap,
+        method: "function getAmountZSDOut(uint256) view returns (uint256)",
+        params: [BigInt(1000000000000000000)],
+      });
+      const WeiBalance = USDtoZSDnum.toString();
+      SetPrice(WeiBalance)
+    } catch (error) {
+      console.error("查询失败:", error);
+    }
+  };
+
   useEffect(() => {
-    // USDTD兑换ZSD
-    const USDtoZSDnumFun = async () => {
-      try {
-        const USDtoZSDnum = await readContract({
-          contract: ZSDSwap,
-          method: "function getAmountZSDOut(uint256) view returns (uint256)",
-          params: [BigInt(1000000000000000000)],
-        });
-        const WeiBalance = USDtoZSDnum.toString();
-        SetPrice(WeiBalance)
-      } catch (error) {
-        console.error("查询失败:", error);
-      }
-    };
+    USDtoZSDnumFun()
 
     form.setFieldsValue({
       usdtInput: usdtValue,
@@ -547,6 +550,9 @@ const Commonform = () => {
                   placeholder="请输入充入金额"
                   className={styles.inputstyle}
                   onChange={(e: any) => {
+                    setUSDTprice(e.target.value) //实时刷新计算算力
+
+
                     setIsButtonDisabled(!e.target.value);
                     setIsButtonDisabledZSD(true); //ZSD
 
