@@ -78,7 +78,6 @@ const Commonform = () => {
   const handleUsdtChange = (value: any) => {
     setZsdprice(value) //实时计算算力
 
-
     // 重置表单
     formONE.resetFields();
     // 异步更新状态
@@ -129,8 +128,6 @@ const Commonform = () => {
     setIsModalOpen(false);
   };
 
-
-
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
     try {
@@ -144,7 +141,6 @@ const Commonform = () => {
         transaction: tx1,
         account: account
       });
-
       const transaction = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTFunds(uint256)",
@@ -167,33 +163,29 @@ const Commonform = () => {
   };
 
   // 充值ZSD
-  async function depositZSDFunds(amount: any) {
-    // const amountnum: any = price * amount;
-    // console.log(amount, "amount++++++++++++++++");
-
+  const depositZSDFunds = async (amount: any) => {
     try {
-      // 确保 amount 是字符串格式
       const amountStr = amount.toString();
       try {
-        //用户的zsd余额
+        // 用户ZSD余额
         const ZSDBalance = await readContract({
           contract: ZSD,
           method: "function balanceOf(address) view returns (uint256)",
           params: [account.address],
         });
 
-        // if (ZSDBalance <= 0) {
+        // if (Number(ZSDBalance.toString()) <= 0) {
         //   message.info("您的ZSD余额不足");
         //   return;
         // }
 
-
-        //用户usdt的余额
+        //用户USDT的余额
         const allowanceZSDBalance = await readContract({
           contract: ZSD,
           method: "function allowance(address, address)",
           params: [account.address, APIConfig.ZSDaddress],
         });
+        console.log(allowanceZSDBalance, 'allowanceZSDBalanceallowanceZSDBalance')
 
         const banlance: any = 100000000000000000000000000000 * 10 ** 18;
         if (allowanceZSDBalance <= 0) {

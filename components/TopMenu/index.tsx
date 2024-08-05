@@ -5,7 +5,7 @@ import Image from "next/image";
 import styles from "./index.module.scss";
 import Top from "../Top";
 import { useRouter } from "next/navigation";
-// import RightMenu from "../RightMenu";
+import RightMenu from "../RightMenu";
 import { MenuContext } from "../MenuContext";
 import { copyToClipboard } from "../../public/clipboard";
 
@@ -80,8 +80,7 @@ const ClientMenu: React.FC = () => {
 
   return (
     <div className={styles.pageMenu}>
-      {/* {isRightMenuVisible && <RightMenu />} */}
-
+      {isRightMenuVisible && <RightMenu />}
       <Top onToggleRightMenu={toggleRightMenu} />
 
       <div className={styles.videoBackground} id="nav">
