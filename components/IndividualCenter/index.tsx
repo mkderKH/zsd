@@ -9,8 +9,9 @@ import {
   prepareEvent,
   getContractEvents,
 } from "thirdweb";
+import Web3 from 'web3';
 
-import { Button, Form, Input, Row, Col } from "antd";
+import { Button, Form, Input, Row, Col, Modal } from "antd";
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { approve, balanceOf } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
@@ -23,7 +24,7 @@ import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
 import { ZSDABI } from "../../abi/ZSDABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
-import { getRpcClient, eth_blockNumber, eth_getLogs } from "thirdweb/rpc";
+import { getRpcClient, eth_blockNumber, eth_getLogs, } from "thirdweb/rpc";
 import { bsc } from "thirdweb/chains";
 const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
@@ -79,14 +80,121 @@ const Commonform = () => {
   const [directNumberPeople, setDirectNumberPeople] = useState<any>();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
   const [price, SetPrice] = useState<any>();
-  const [transactionRecord, setTransactionRecord] = useState<any>([]);
+  const [transactionRecord, setTransactionRecord] = useState<any>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [convertedDatalist, setConvertedDatalist] = useState<any>([]);
+  const [convertedDatalistone, setConvertedDatalistone] = useState<any>([]);
 
-  useEffect(() => {
-    if (account) {
-      setStoredAccount(account);
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  // 查询交易记录
+  const TransactionRecordFun = async (addressnew: any) => {
+    const rpcRequest = getRpcClient({ client, chain: bsc });
+    const blockNumber = await eth_blockNumber(rpcRequest);
+    try {
+      const response = await axios.get(
+        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
+        // `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`//测试
+        `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+      );
+      // 用于存储转换后数据的数组
+      const convertedData = response.data.result.map((item: any) => {
+        // 提取topics[3]，去掉前缀'0x'，然后转换为十进制数，除以10**18（假设它是一个以wei表示的以太坊金额）
+        const topics3Decimal = parseInt(item.topics[2].slice(2), 16) / (10 ** 18);
+        // 提取timeStamp，转换为十进制
+        const timeStampDecimal = parseInt(item.timeStamp, 16);
+        // 将Unix时间戳转换为日期
+        const date = new Date(timeStampDecimal * 1000);
+        date.setUTCHours(date.getUTCHours() + 8);
+
+        // 使用Date对象的方法获取年、月、日、时、分、秒
+        let year = date.getUTCFullYear();
+        let month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        let day = date.getUTCDate().toString().padStart(2, '0');
+        let hours = date.getUTCHours().toString().padStart(2, '0');
+        let minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        let seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+        // 构建新的格式化时间字符串
+        let formattedTime = `${year}-${month}-${day}:${hours}:${minutes}.${seconds}`;
+        return {
+          topics3Decimal, // topics[3]的十进制表示
+          timeStampDate: formattedTime, // timeStamp转换为ISO格式的日期时间字符串
+        };
+      });
+      setConvertedDatalist(convertedData)
+      return response.data;
+    } catch (error) {
+      console.error("请求错误:", error);
     }
-  }, [account]);
+  }
 
+  const TransactionZSDRecordFun = async (addressnew: any) => {
+    const rpcRequest = getRpcClient({ client, chain: bsc });
+    const blockNumber = await eth_blockNumber(rpcRequest);
+    try {
+      // const response = await axios.get(
+      //   `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
+      //   `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+      // );
+
+      const response = await axios.get(
+        `https://api.bscscan.com/api?module=account&action=txlist&address=${addressnew.substring(2).replace(/\s+/g, '')}&to=${APIConfig.ZSDPROJECTAddress}&sort=desc&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+      );
+      // console.log(response.data.result, '转换前')
+
+
+
+      // https://api.bscscan.com/api?module=account&action=txlist&address=0x44e83cd293a12fc57b732137488604cb36704a9e&to=${APIConfig.ZSDPROJECTAddress}&sort=desc&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3
+
+      //过滤出函数名为   "functionName": "depositUSDTANDZSDFunds(uint256 usdtAmount)",
+      //    "input": "0xfb497fe30000000000000000000000000000000000000000000000000de0b6b3a7640000", 转换为时间值 除以 3 乘以 7 乘 3
+      //    "timeStamp": "1722657320",
+
+
+
+      // 用于存储转换后数据的数组
+      const convertedData = response.data.result.map((item: any) => {
+        if (item.functionName == "depositUSDTANDZSDFunds(uint256 usdtAmount)") {
+          // const inputData = '0xfb497fe3000000000000000000000000000000000000000000000000000de0b6b3a7640000';
+
+          const inputData = item.input;
+          const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org/'));
+          const params = ['uint256'];
+          const decoded: any = web3.eth.abi.decodeParameters(params, inputData.slice(4));
+          const decodedBigInt = BigInt(decoded[0]);
+          const decodedStr: any = decodedBigInt.toString()
+
+          // 将Unix时间戳转换为日期
+          const date = new Date(item.timeStamp * 1000);
+          date.setUTCHours(date.getUTCHours() + 8);
+
+          // 使用Date对象的方法获取年、月、日、时、分、秒
+          let year = date.getUTCFullYear();
+          let month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+          let day = date.getUTCDate().toString().padStart(2, '0');
+          let hours = date.getUTCHours().toString().padStart(2, '0');
+          let minutes = date.getUTCMinutes().toString().padStart(2, '0');
+          let seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+          // 构建新的格式化时间字符串
+          let formattedTime = `${year}-${month}-${day}:${hours}:${minutes}.${seconds}`;
+          return {
+            decodedStr,
+            timeStampDate: formattedTime, // timeStamp转换为ISO格式的日期时间字符串
+          };
+        }
+      });
+
+      setConvertedDatalistone(convertedData)
+      return response.data;
+    } catch (error) {
+      console.error("请求错误:", error);
+    }
+  }
 
   const onFinish = async (values: any) => {
     try {
@@ -184,7 +292,6 @@ const Commonform = () => {
         setUSDTBalance(formattedBalance);
         setZSDBalance(formattedBalancetwo);
 
-
         const USDtoZSDnum = await readContract({
           contract: ZSDSwap,
           method: "function getAmountZSDOut(uint256) view returns (uint256)",
@@ -196,13 +303,25 @@ const Commonform = () => {
         const ComputingPower = await readContract({
           contract: ZSDContractPoject,
           method: "users",
-          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
+          params: [storedAccount.address],
         });
-        const computingPowerSecond = Number(ComputingPower[2].toString());
-        const computingPowerThird = Number(ComputingPower[3].toString());
-        const weiBalanceOne = Number(WeiBalanceone);
-        const FinalEffortdata = ((computingPowerSecond + computingPowerThird) / weiBalanceOne) / (10 ** 18)
+        const bigIntNumber1 = ComputingPower[2];
+        const bigIntNumber2 = ComputingPower[3];
 
+        const computingPowerSecond = Number(bigIntNumber1);
+        const computingPowerThird = Number(bigIntNumber2);
+        const weiBalanceOne = Number(WeiBalanceone);
+        const FinalEffortdata = (computingPowerSecond / (10 ** 18) + computingPowerThird / weiBalanceOne)
+
+        let timestampInMs = Number(ComputingPower[4]);
+        // 获取当前时间的时间戳（以秒为单位）
+        const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+        // 提取计算   ||  当前时间戳  减去  取出来的时间戳  /   86400000（秒） =  时间    （* 0.05 * FinalEffortdata = 提走的币）
+        const Withdraw = ((currentTimeInSeconds - timestampInMs) / 86400000) * 0.05 * FinalEffortdata
+
+        setTransactionRecord(Withdraw)
+        // 总算力计算
+        // timeFun(1722762910);
         // 最终算力
         setFinalEffort(FinalEffortdata);
         // ZSD
@@ -213,11 +332,19 @@ const Commonform = () => {
         console.error("查询余额失败:", error);
       }
     };
+
     if (storedAccount) {
       depositFunds();
     }
   }, [storedAccount]);
 
+  useEffect(() => {
+    if (account) {
+      setStoredAccount(account);
+      TransactionRecordFun(account.address)
+      TransactionZSDRecordFun(account.address)
+    }
+  }, [account]);
   return (
     <>
       <div className={styles.Content}>
@@ -260,13 +387,23 @@ const Commonform = () => {
           <Row>
             <Col span={24}>
               <Form.Item colon={false} name="USDT_two_amount">
-                <Input
+                <div className={styles.inputstyle2}>
+                  {Finaleffort}
+                </div>
+                {/* <Input
                   className={styles.inputstyle}
                   disabled
                   placeholder={Finaleffort}
                   value={Finaleffort}
-                />
+                /> */}
               </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <div className={styles.labelContainer} style={{ margin: 'auto' }}>
+                <span className={styles.labelLeft}>可提取ZSD:  <span className={styles.labelLeftone}>{transactionRecord}</span></span>
+              </div>
             </Col>
           </Row>
           {/* <Row>
@@ -284,7 +421,7 @@ const Commonform = () => {
           <Row>
             <Col span={24} className={styles.cost}>
               <span className={styles.CalculatedValue}>
-                当前ZSD价值 1USDT={price / 10 ** 18}ZSD
+                当前ZSD价值: <span className={styles.inputstyle3}>1USDT={price / 10 ** 18}ZSD</span>
               </span>
             </Col>
           </Row>
@@ -301,6 +438,21 @@ const Commonform = () => {
               </Form.Item>
             </Col>
           </Row>
+          <Row>
+            <Col span={24}>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  className={styles.buttonstyle}
+                  onClick={() => {
+                    setIsModalOpen(true);
+                  }}
+                >
+                  充值明细
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </div>
 
@@ -313,6 +465,46 @@ const Commonform = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        title=""
+        open={isModalOpen}
+        onCancel={handleCancel}
+        destroyOnClose={true}
+        footer={
+          <div>
+            <Button onClick={handleCancel} className={styles.Cancelstyle} type="primary"
+            >
+              取消
+            </Button>
+          </div>
+        }
+      >
+        <div className={styles.conters}>
+          <span>算力</span>
+          <span>时间</span>
+        </div>
+
+        <div>
+          {convertedDatalist.map((item: any, index: any) => (
+            <div key={index} className={styles.contersone}>
+              <span >{item.topics3Decimal * 2}</span>
+              <span >{item.timeStampDate}</span>
+            </div>
+          ))}
+
+          {
+            convertedDatalistone
+              .filter((item: any) => item !== undefined) // 过滤掉undefined的元素
+              .map((item: any, index: any) => (
+                <div key={index} className={styles.contersone}>
+                  <span>{item && item.decodedStr}</span>
+                  <span>{item && item.timeStampDate}</span>
+                </div>
+              ))
+          }
+        </div>
+      </Modal>
     </>
   );
 };

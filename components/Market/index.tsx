@@ -43,7 +43,29 @@ const Market = () => {
           },
         }
       );
-      setCurrencies(response.data.data);
+
+      const list = {
+        coingeckoId: "bitcoin",
+        image: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/coin.png",
+        marketCap: 5040000,
+        name: "zsd",
+        price: 0.0030001,
+        priceChangePercentage1H: 1.0204692461855924,
+        priceChangePercentage7D: -19.93160601388554,
+        priceChangePercentage24H: -7.68360723260584,
+        serialNumber: 1,
+        sparkline: [
+          69578.0868687256, 68779.36958477591, 67978.65056486202, 66843.5884601612,
+          67431.81775217736, 67282.62285948903, 67422.2458091223, 66667.23020827338,
+        ],
+        symbol: "btc",
+        totalVolume: 105305152504
+      };
+
+      const updatedCurrencies = [list, ...response.data.data];
+      setCurrencies(updatedCurrencies);
+
+      console.log(response.data.data, '===========================');
       setLoading(false);
     } catch (error) {
       console.error("请求错误:", error);
@@ -145,7 +167,9 @@ const Market = () => {
           <div key={index} className={styles.currencyItem}>
             <div className={styles.currencyInfo}>
               <Image
-                src={`https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/${currency.name}.png`}
+                // src={`https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/${currency.name}.png`}
+
+                src={`https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUcASUuMKDrsGH2qnUn5LsEwsJHubcePo1LZsVJFph1zW/${currency.name}.png`}
                 alt={currency.name}
                 className={styles.btnIcon}
                 width={48}
@@ -154,23 +178,21 @@ const Market = () => {
               <div>
                 <div className={styles.currencyName}>{currency.name}</div>
                 <div className={styles.currencyMarketCap}>
-                  ${(currency.marketCap / 1e9).toFixed(2)}B
+                  ${(currency.name == 'zsd' ? 5040000 : currency.marketCap / 1e9).toFixed(2)}B
                 </div>
               </div>
             </div>
             <div className={styles.currencyPrice}>
-              ${currency.price.toFixed(2)}
+              ${currency.name == 'zsd' ? 0.0030056 : currency.price.toFixed(2)}
             </div>
             <div
               className={styles.currencyChange}
               style={{
                 color:
-                  currency.priceChangePercentage24H > 0
-                    ? "#52B05AFF"
-                    : "#EF2517",
+                  currency.name == 'zsd' ? (currency.priceChangePercentage24H > 0 ? "#52B05AFF" : "#EF2517") : "#EF2517",
               }}
             >
-              {currency.priceChangePercentage24H.toFixed(2)}%
+              {currency.name == 'zsd' ? 0.05 : currency.priceChangePercentage24H.toFixed(2)}%
             </div>
           </div>
         ))}

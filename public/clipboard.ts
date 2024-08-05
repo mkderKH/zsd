@@ -50,9 +50,6 @@ export const copyToClipboard = async (text: string): Promise<void> => {
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
-
-
-    console.error('复制时发生错误：', err);
     message.error('复制失败，请稍后重试');
   }
 };

@@ -6,7 +6,7 @@ import {
 import { Button, Form, Row, Col } from "antd";
 import { approve, balanceOf } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
-
+import { useActiveAccount } from "thirdweb/react";
 import { getRpcClient, eth_blockNumber, eth_getLogs } from "thirdweb/rpc";
 import axios from "axios";
 
@@ -19,16 +19,12 @@ export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 import { APIConfig } from "../../abi/APIConfiguration";
 import { bsc } from "thirdweb/chains"; //主网
 
-const data = [
-  { amount: '0', date: '2024.08.04' },
-];
-
 const Commonform = () => {
   const [switchingState, setSwitchingState] = useState<any>(1);
   const [transactionRecord, setTransactionRecord] = useState<any>([]);
   const [totalAmountone, setTotalAmountone] = useState<any>('');
-
-
+  const [storageAccount, setStorageAccount] = useState<any>('');
+  const account: any = useActiveAccount();
 
   // 到账时间
   const TimeStampFun = (time: any) => {
@@ -85,15 +81,14 @@ const Commonform = () => {
   };
 
   // 查询交易记录
-  const TransactionRecordFun = async () => {
+  const TransactionRecordFun = async (addressnew: any) => {
     const rpcRequest = getRpcClient({ client, chain: bsc });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
         `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
-        `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+        `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
-
       setTransactionRecord(response.data.result);
       let totalAmount = 0; // 定义一个变量来存储总金额
       // 总金额计算
@@ -111,13 +106,13 @@ const Commonform = () => {
     }
   }
 
-  // const ClickToswitch = (value: any) => {
-  //   setSwitchingState(value)
-  // };
-
   useEffect(() => {
-    TransactionRecordFun()
-  }, []);
+    if (account) {
+      setStorageAccount(account.address)
+      let addressnew = account.address
+      TransactionRecordFun(addressnew)
+    }
+  }, [account]);
   return (
     <>
       <div className={styles.Content}>
