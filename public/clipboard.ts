@@ -10,7 +10,15 @@ export const copyToClipboard = async (text: string): Promise<void> => {
   try {
     if (isClipboardApiSupported()) {
       // 使用新的异步 Clipboard API
-      await navigator.clipboard.writeText(text);
+      // await navigator.clipboard.writeText(text);
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
       message.success('复制成功');
     } else {
       // 退回到 document.execCommand 方法
@@ -36,6 +44,14 @@ export const copyToClipboard = async (text: string): Promise<void> => {
       }
     }
   } catch (err) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+
     console.error('复制时发生错误：', err);
     message.error('复制失败，请稍后重试');
   }
