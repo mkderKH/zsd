@@ -164,13 +164,13 @@ const Commonform = () => {
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
     try {
-      // debugger
+
+      const amount1 = amount * 10 ** 18;
       const transaction = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTFunds(uint256)",
-        params: [toWei(amount)],
+        params: [BigInt(amount1)],
       });
-
       console.log(account.address, "==========================");
 
       // 发送交易并等待用户签名确认
@@ -178,10 +178,10 @@ const Commonform = () => {
         transaction: transaction,
         account: account.address,
       });
+      console.log(registerTXResult, 'resultresultresult')
 
 
       // const result = await sendTransaction(transaction);
-      console.log(registerTXResult, 'resultresultresult')
 
       // message.info("您的USDT充值成功");
       formONE.resetFields();
@@ -198,13 +198,14 @@ const Commonform = () => {
   const depositZSDFunds = async (amount: any) => {
     try {
       debugger
-      const amountStr = amount.toString();
+      //const amountStr = amount.toString();
       try {
         // 用户给zsd充值的数量不能超过balance
+        const amountStr = amount * 10 ** 18;
         const transaction = prepareContractCall({
           contract: ZSDProjectContract,
           method: "function depositUSDTANDZSDFunds(uint256)",
-          params: [toWei(amountStr)],
+          params: [BigInt(amountStr)],
         });
         // 发送交易并等待用户签名确认(首次需要，第二次不需要)
         const registerTXResult = await sendAndConfirmTransaction({

