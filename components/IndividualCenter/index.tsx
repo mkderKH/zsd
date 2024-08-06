@@ -97,8 +97,8 @@ const Commonform = () => {
     try {
       const response = await axios.get(
         `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
-        // `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`//测试
-        `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+        `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`//测试
+        // `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       // 用于存储转换后数据的数组
       const convertedData = response.data.result.map((item: any) => {
@@ -136,30 +136,19 @@ const Commonform = () => {
     const rpcRequest = getRpcClient({ client, chain: bsc });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
-      // const response = await axios.get(
-      //   `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
-      //   `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
-      // );
-
       const response = await axios.get(
-        `https://api.bscscan.com/api?module=account&action=txlist&address=${addressnew.substring(2).replace(/\s+/g, '')}&to=${APIConfig.ZSDPROJECTAddress}&sort=desc&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
+        `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
-      // console.log(response.data.result, '转换前')
 
-
-
-      // https://api.bscscan.com/api?module=account&action=txlist&address=0x44e83cd293a12fc57b732137488604cb36704a9e&to=${APIConfig.ZSDPROJECTAddress}&sort=desc&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3
-
-      //过滤出函数名为   "functionName": "depositUSDTANDZSDFunds(uint256 usdtAmount)",
-      //    "input": "0xfb497fe30000000000000000000000000000000000000000000000000de0b6b3a7640000", 转换为时间值 除以 3 乘以 7 乘 3
-      //    "timeStamp": "1722657320",
-
+      // const response = await axios.get(
+      //   `https://api.bscscan.com/api?module=account&action=txlist&address=${addressnew.substring(2).replace(/\s+/g, '')}&to=${APIConfig.ZSDPROJECTAddress}&sort=desc&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+      // );
 
 
       // 用于存储转换后数据的数组
       const convertedData = response.data.result.map((item: any) => {
         if (item.functionName == "depositUSDTANDZSDFunds(uint256 usdtAmount)") {
-          // const inputData = '0xfb497fe3000000000000000000000000000000000000000000000000000de0b6b3a7640000';
 
           const inputData = item.input;
           const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org/'));
@@ -263,7 +252,7 @@ const Commonform = () => {
         const USDTBalance = await readContract({
           contract: USDTContract,
           method: "function balanceOf(address) view returns (uint256)",
-          params: [storedAccount.address],
+          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
         });
         const WeiBalance = BigInt(USDTBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
         const USDT_DECIMALS = 6; // 假设 USDT 的小数精度为 6
@@ -273,12 +262,17 @@ const Commonform = () => {
         const Compareone = parseFloat(usdtBalance.toString());
         // 将 BigInt 转换为常规数字并保留两位小数
         const formattedBalance = Compareone == 0 ? Compareone : (parseFloat(usdtBalance.toString()) / 10 ** USDT_DECIMALS).toFixed(2);
+        console.log(formattedBalance, '1======================')
+
+
+
 
         //用户zsd余额
         const ZSDBalance = await readContract({
           contract: ZSDContract,
           method: "function balanceOf(address) view returns (uint256)",
-          params: [storedAccount.address],
+          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
+          // params: [storedAccount.address],
         });
         const WeiBalancetwo = BigInt(ZSDBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
         const USDT_DECIMALStwo = 6; // 假设 USDT 的小数精度为 6
@@ -292,6 +286,10 @@ const Commonform = () => {
         setUSDTBalance(formattedBalance);
         setZSDBalance(formattedBalancetwo);
 
+
+
+
+
         const USDtoZSDnum = await readContract({
           contract: ZSDSwap,
           method: "function getAmountZSDOut(uint256) view returns (uint256)",
@@ -303,7 +301,8 @@ const Commonform = () => {
         const ComputingPower = await readContract({
           contract: ZSDContractPoject,
           method: "users",
-          params: [storedAccount.address],
+          // params: [storedAccount.address],
+          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
         });
         const bigIntNumber1 = ComputingPower[2];
         const bigIntNumber2 = ComputingPower[3];
@@ -312,20 +311,19 @@ const Commonform = () => {
         const computingPowerThird = Number(bigIntNumber2);
         const weiBalanceOne = Number(WeiBalanceone);
         const FinalEffortdata = (computingPowerSecond / (10 ** 18) + computingPowerThird / weiBalanceOne)
-
         let timestampInMs = Number(ComputingPower[4]);
-        // 获取当前时间的时间戳（以秒为单位）
-        const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-        // 提取计算   ||  当前时间戳  减去  取出来的时间戳  /   86400000（秒） =  时间    （* 0.05 * FinalEffortdata = 提走的币）
-        const Withdraw = ((currentTimeInSeconds - timestampInMs) / 86400000) * 0.05 * FinalEffortdata
+
+        // 获取当前时间的Date对象
+        let now = new Date();
+        // 获取当前时间的时间戳（毫秒）
+        let timestamp = now.getTime();
+
+        // 提取计算   ||  当前时间戳  减去  取出来的时间戳  /   86400000（秒） =  时间    （* 0.005 * FinalEffortdata = 提走的币）
+        const Withdraw = (((timestamp / 1000 - timestampInMs) / 86400) * 0.005 * FinalEffortdata) * weiBalanceOne / (10 ** 18)
 
         setTransactionRecord(Withdraw)
-        // 总算力计算
-        // timeFun(1722762910);
         // 最终算力
         setFinalEffort(FinalEffortdata);
-        // ZSD
-        // setFinalEffortZSD(FinalEffortdata2);
         // 直推人数
         setDirectNumberPeople(ComputingPower[1].toString());
       } catch (error) {

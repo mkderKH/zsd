@@ -12,37 +12,37 @@ import { copyToClipboard } from "../../public/clipboard";
 const imageArray = [
   {
     link: `/Machine`,
-    url: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/kj.png",
+    url: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/kj.png",
     name: "矿机",
     en: "MINING MACHINE",
   },
   {
     link: "/Personal",
-    url: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/gxzx.png",
+    url: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/gxzx.png",
     name: "个人中心",
     en: "PERSONAL CENTER",
   },
   {
     link: "/Community",
-    url: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/sq.png",
+    url: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/sq.png",
     name: "社区",
     en: "COMMUNITY",
   },
   {
     link: "/InCode",
-    url: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/yqm.png",
+    url: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/yqm.png",
     name: "邀请码",
     en: "INVITATION CODE",
   },
   {
     link: "/HomeLess",
-    url: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/sy.png",
+    url: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/sy.png",
     name: "首页",
     en: "HOME",
   },
   {
     link: "/Flash",
-    url: "https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/sd.png",
+    url: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/sd.png",
     name: "闪兑",
     en: "INSTANT EXCHANGE",
   },
@@ -57,7 +57,7 @@ const ClientMenu: React.FC = () => {
   };
 
   const handleCopyClick = () => {
-    const textToCopy = `http://localhost:3000/HomeLess?ref=${account ? account.address : ''}`;
+    const textToCopy = `https://m.zsdcoin.com?ref=${account ? account.address : ''}`;
     copyToClipboard(textToCopy);
   };
 
@@ -85,7 +85,7 @@ const ClientMenu: React.FC = () => {
 
       <div className={styles.videoBackground} id="nav">
         <video autoPlay muted loop id="bg-video">
-          <source src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmYHibrfvBUmBhxitkovCGL8kHX2nurtB7TPAkhjLknZM8" type="video/mp4" />
+          <source src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/shequ.mp4" type="video/mp4" />
         </video>
       </div>
 

@@ -23,7 +23,7 @@ const RightMenu: React.FC = () => {
         <Image
           data-id="RightMenu"
           className={styles.img}
-          src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/sy.png"
+          src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/sy.png"
           alt="coin"
           width={50}
           height={50}
@@ -40,7 +40,7 @@ const RightMenu: React.FC = () => {
         <Image
           data-id="RightMenu"
           className={styles.img}
-          src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/kj.png"
+          src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/kj.png"
           alt="coin"
           width={50}
           height={50}
@@ -57,7 +57,7 @@ const RightMenu: React.FC = () => {
         <Image
           data-id="RightMenu"
           className={styles.img}
-          src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/sd.png"
+          src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/sd.png"
           alt="coin"
           width={50}
           height={50}
@@ -74,7 +74,7 @@ const RightMenu: React.FC = () => {
         <Image
           data-id="RightMenu"
           className={styles.img}
-          src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/sq.png"
+          src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/sq.png"
           alt="coin"
           width={50}
           height={50}
@@ -91,7 +91,7 @@ const RightMenu: React.FC = () => {
         <Image
           data-id="RightMenu"
           className={styles.img}
-          src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/yqm.png"
+          src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/yqm.png"
           alt="coin"
           width={50}
           height={50}
@@ -108,7 +108,7 @@ const RightMenu: React.FC = () => {
         <Image
           data-id="RightMenu"
           className={styles.img}
-          src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/grzx.png"
+          src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/grzx.png"
           alt="coin"
           width={50}
           height={50}

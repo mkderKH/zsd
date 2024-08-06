@@ -10,7 +10,7 @@ const TopMenu: React.FC<TopProps> = ({ onToggleRightMenu }) => {
     <div className={styles.pagetop}>
       <Image
         className={styles.m1}
-        src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/coin.png"
+        src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/coin.png"
         alt="coin"
         width={50}
         height={50}
@@ -20,7 +20,7 @@ const TopMenu: React.FC<TopProps> = ({ onToggleRightMenu }) => {
 
       <Image
         className={styles.m2}
-        src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/selectorSwitch.png"
+        src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/selectorSwitch.png"
         alt="selectorSwitch"
         width={50}
         height={50}
@@ -28,7 +28,7 @@ const TopMenu: React.FC<TopProps> = ({ onToggleRightMenu }) => {
       <Image
         onClick={onToggleRightMenu}
         className={styles.m3}
-        src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/menu.png"
+        src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/menu.png"
         alt="menu"
         width={50}
         height={50}

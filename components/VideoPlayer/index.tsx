@@ -8,7 +8,7 @@ const VideoPlayer = () => {
       <Col>
         <video className={styles.video} width="100%" controls>
           <source
-            src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/shequ.mp4"
+            src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmWoFxzAZ3pXcGTyBvvZsM6NE3GNE7UY2y6GfLjAxgWiuu"
             type="video/mp4"
           />
           您的浏览器不支持视频标签。

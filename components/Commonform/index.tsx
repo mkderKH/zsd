@@ -75,8 +75,12 @@ const Commonform = () => {
     abi: contractZSDSwapABI,
     chain: bsc,
   });
+
   const handleUsdtChange = (value: any) => {
-    setZsdprice(value) //实时计算算力
+    let Test = (value * 2) + (value / 3 * 7) * 3
+
+    form.setFieldsValue({ ComputingPower_ZSD: Test });//将算力给到算力输入框
+    setZsdprice(Test) //实时计算算力
 
     // 重置表单
     formONE.resetFields();
@@ -88,6 +92,33 @@ const Commonform = () => {
     setIsButtonDisabled(true); //USDT
 
     const trimmedValue = value.trim();
+    if (trimmedValue === "") {
+      setUsdtValue("");
+      setZsdValue("");
+      setToken(""); // 确保 token 也被清空
+      form.setFieldsValue({ zsdAddress: "" }); // 更新表单字段的值
+      return;
+    }
+    const numberValue = parseFloat(trimmedValue);
+    if (isNaN(numberValue)) {
+      setUsdtValue("0");
+      setZsdValue("0");
+      form.setFieldsValue({ zsdAddress: "0" }); // 设置为 0 或保持错误状态
+      return;
+    }
+    const zsdCalculated = Number(((numberValue * 7) / 3).toFixed(2));
+
+    setUsdtValue(trimmedValue);
+    setZsdValue(zsdCalculated);
+    const tokenValue = zsdCalculated * price / 10 ** 18;
+    setToken(tokenValue);
+    form.setFieldsValue({ zsdAddress: tokenValue });
+  };
+
+
+  // 处理zsd
+  const ZSDChange = (value: any) => {
+    const trimmedValue = value;
     if (trimmedValue === "") {
       setUsdtValue("");
       setZsdValue("");
@@ -432,7 +463,6 @@ const Commonform = () => {
         console.error("处理充值请求时发生错误:", error);
       }
     } else if (values.zsdAddress) {
-
       // 充值ZSD
       await depositZSDFunds(values.zsdAddress);
     }
@@ -457,18 +487,18 @@ const Commonform = () => {
   //   return Promise.resolve();
   // };
 
-  const amountValidator = (rule: any, value: any) => {
-    if (!value) {
-      return Promise.resolve();
-    }
-    const reg = /^[0-9]*$/;
-    if (!reg.test(value)) {
-      return Promise.reject(
-        new Error("请输入有效的数字，不能输入负数和其他字符！")
-      );
-    }
-    return Promise.resolve();
-  };
+  // const amountValidator = (rule: any, value: any) => {
+  //   if (!value) {
+  //     return Promise.resolve();
+  //   }
+  //   const reg = /^[0-9]*$/;
+  //   if (!reg.test(value)) {
+  //     return Promise.reject(
+  //       new Error("请输入有效的数字，不能输入负数和其他字符！")
+  //     );
+  //   }
+  //   return Promise.resolve();
+  // };
 
   // 查询ZSD的当前价格的异步函数
   // const ZSDfun = async () => {
@@ -527,27 +557,26 @@ const Commonform = () => {
         >
           <Row>
             <Col span={24}>
-              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：{uSDTprice * 2}</span></div>
+              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：{uSDTprice}</span></div>
             </Col>
             <Col span={24}>
               <Form.Item
                 colon={false}
                 name="USDT_one_SingleCharge"
-                rules={[
-                  { required: true, message: "请输入充入金额!" },
-                  { validator: amountValidator },
-                ]}
+              // rules={[
+              //   { required: true, message: "请输入充入金额!" },
+              //   { validator: amountValidator },
+              // ]}
               >
                 <Input
                   placeholder="请输入充入金额"
                   className={styles.inputstyle}
                   onChange={(e: any) => {
-                    setUSDTprice(e.target.value) //实时刷新计算算力
+                    formONE.setFieldsValue({ ComputingPower_USDT: e.target.value * 2 }); // 更新表单字段的值
 
-
+                    setUSDTprice(e.target.value * 2) //实时刷新计算算力
                     setIsButtonDisabled(!e.target.value);
                     setIsButtonDisabledZSD(true); //ZSD
-
                     // 当输入A则清除B，输入B则清除A
                     form.resetFields();
                     // 异步更新状态
@@ -558,8 +587,24 @@ const Commonform = () => {
                 />
               </Form.Item>
             </Col>
-          </Row>
 
+            {/* 算力 */}
+            <Col span={24}>
+              <Form.Item
+                colon={false}
+                name="ComputingPower_USDT"
+              >
+                <Input
+                  placeholder="请输入充入算力"
+                  className={styles.inputstyle}
+                  onChange={(e: any) => {
+                    formONE.setFieldsValue({ USDT_one_SingleCharge: e.target.value / 2 }); // 更新表单字段的值
+                    setUSDTprice(e.target.value)
+                  }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           <Row>
             <Col span={24}>
               <Form.Item>
@@ -589,6 +634,7 @@ const Commonform = () => {
         </Form>
       </div>
 
+
       {/* model2 */}
       <div className={styles.Content}>
         <Form
@@ -602,17 +648,13 @@ const Commonform = () => {
         >
           <Row>
             <Col span={24}>
-              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：{(zsdprice * 2) + (zsdprice / 3 * 7) * 3}</span></div>
+              <div className={styles.ComputingPower}><span className={styles.Contentlabel}>USDT</span> <span className={styles.power}>算力：{zsdprice}</span></div>
             </Col>
             <Col span={24}>
               <Form.Item
                 colon={false}
                 name="usdtInput"
                 initialValue={usdtValue}
-                rules={[
-                  { required: true, message: "请输入充入金额!" },
-                  { validator: amountValidator },
-                ]}
               >
                 <Input
                   placeholder="请输入充入金额"
@@ -644,6 +686,30 @@ const Commonform = () => {
                 />
               </Form.Item>
             </Col>
+            {/* 算力 */}
+            <Col span={24}>
+              <Form.Item
+                colon={false}
+                name="ComputingPower_ZSD"
+              >
+                <Input
+                  placeholder="请输入充入算力"
+                  className={styles.inputstyle}
+                  onChange={(e: any) => {
+                    setZsdprice(e.target.value);
+                    setUsdtValue(Number(e.target.value) / 9)
+
+
+                    // 反推USDT+ZSDT
+                    ZSDChange(Number(e.target.value) / 9)
+
+                    // form.setFieldsValue({
+                    //   usdtInput: Number(e.target.value) / 9,
+                    // });
+                  }}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Row style={{ marginBottom: "20px" }}>
             <Col span={24}>
@@ -651,9 +717,10 @@ const Commonform = () => {
                 USDT+ZSD：
                 {parseFloat(usdtValue || 0) + parseFloat(zsdValue || 0)}
               </span>
-              <span className={styles.Ustyle}>U</span>
+              <span className={styles.Ustyle}>USDT</span>
             </Col>
           </Row>
+
           <Row>
             <Col span={24}>
               <Form.Item>

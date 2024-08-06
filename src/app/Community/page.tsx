@@ -21,7 +21,7 @@ const Community = () => {
             <div className={styles.chatbubble}>
               <div className={styles.icon}>
                 <Image
-                  src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/xn.png"
+                  src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/xn.png"
                   width={50}
                   height={50}
                   alt="Paperplane"
@@ -35,7 +35,7 @@ const Community = () => {
             <div className={styles.chatbubble}>
               <div className={styles.icon}>
                 <Image
-                  src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj/tlgrm.png"
+                  src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/tlgrm.png"
                   width={50}
                   height={50}
                   alt="Twitter"
@@ -48,7 +48,7 @@ const Community = () => {
             <div className={styles.chatbubble}>
               <div className={styles.icon}>
                 <Image
-                  src="https://salmon-fortunate-goat-221.mypinata.cloud/ipfs/QmUenvyCWQKeYUps8d3dMotqie98MRcFKYWcsV1vSgAvSj//wyj.png"
+                  src="https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7//wyj.png"
                   width={50}
                   height={50}
                   alt="Internet Explorer"
