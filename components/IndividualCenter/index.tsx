@@ -6,8 +6,6 @@ import {
   prepareContractCall,
   createThirdwebClient,
   sendAndConfirmTransaction,
-  prepareEvent,
-  getContractEvents,
 } from "thirdweb";
 import Web3 from 'web3';
 
@@ -30,7 +28,6 @@ const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
 const contractZSDSwapABI: any = ZSDSwapABI;
 const contractZSD: any = ZSDABI
-
 
 //USDT
 const USDTContract = getContract({
@@ -97,13 +94,15 @@ const Commonform = () => {
     try {
       const response = await axios.get(
         `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
-        `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`//测试
-        // `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+        // `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`//测试
+        `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       // 用于存储转换后数据的数组
       const convertedData = response.data.result.map((item: any) => {
         // 提取topics[3]，去掉前缀'0x'，然后转换为十进制数，除以10**18（假设它是一个以wei表示的以太坊金额）
         const topics3Decimal = parseInt(item.topics[2].slice(2), 16) / (10 ** 18);
+
+
         // 提取timeStamp，转换为十进制
         const timeStampDecimal = parseInt(item.timeStamp, 16);
         // 将Unix时间戳转换为日期
@@ -138,7 +137,7 @@ const Commonform = () => {
     try {
       const response = await axios.get(
         `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
-        `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
+        `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
 
       // const response = await axios.get(
@@ -149,13 +148,14 @@ const Commonform = () => {
       // 用于存储转换后数据的数组
       const convertedData = response.data.result.map((item: any) => {
         if (item.functionName == "depositUSDTANDZSDFunds(uint256 usdtAmount)") {
-
           const inputData = item.input;
           const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org/'));
           const params = ['uint256'];
           const decoded: any = web3.eth.abi.decodeParameters(params, inputData.slice(4));
           const decodedBigInt = BigInt(decoded[0]);
           const decodedStr: any = decodedBigInt.toString()
+          // console.log(decodedStr, '==========================22222222222222');
+
 
           // 将Unix时间戳转换为日期
           const date = new Date(item.timeStamp * 1000);
@@ -252,7 +252,7 @@ const Commonform = () => {
         const USDTBalance = await readContract({
           contract: USDTContract,
           method: "function balanceOf(address) view returns (uint256)",
-          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
+          params: [storedAccount.address],
         });
         const WeiBalance = BigInt(USDTBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
         const USDT_DECIMALS = 6; // 假设 USDT 的小数精度为 6
@@ -262,16 +262,12 @@ const Commonform = () => {
         const Compareone = parseFloat(usdtBalance.toString());
         // 将 BigInt 转换为常规数字并保留两位小数
         const formattedBalance = Compareone == 0 ? Compareone : (parseFloat(usdtBalance.toString()) / 10 ** USDT_DECIMALS).toFixed(2);
-        console.log(formattedBalance, '1======================')
-
-
-
 
         //用户zsd余额
         const ZSDBalance = await readContract({
           contract: ZSDContract,
           method: "function balanceOf(address) view returns (uint256)",
-          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
+          params: [storedAccount.address],
           // params: [storedAccount.address],
         });
         const WeiBalancetwo = BigInt(ZSDBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
@@ -302,7 +298,7 @@ const Commonform = () => {
           contract: ZSDContractPoject,
           method: "users",
           // params: [storedAccount.address],
-          params: ['0x44e83cD293a12FC57b732137488604CB36704a9e'],
+          params: [storedAccount.address],
         });
         const bigIntNumber1 = ComputingPower[2];
         const bigIntNumber2 = ComputingPower[3];
