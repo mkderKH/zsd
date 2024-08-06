@@ -27,7 +27,7 @@ import { bsc } from "thirdweb/chains";
 const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
 const contractZSDSwapABI: any = ZSDSwapABI;
-const contractZSD: any = ZSDABI
+const ZsdABI: any = ZSDABI
 
 //USDT
 const USDTContract = getContract({
@@ -36,13 +36,6 @@ const USDTContract = getContract({
   chain: bsc,
 });
 
-// ZSD
-const contractZSDabi = getContract({
-  client: client,
-  address: APIConfig.ZSDaddress,
-  chain: bsc,
-  abi: contractZSD
-});
 
 //用户必须已经授权本合约从USDT合约划转账务
 const ZSDContract = getContract({
@@ -264,12 +257,11 @@ const Commonform = () => {
         const formattedBalance = Compareone == 0 ? Compareone : (parseFloat(usdtBalance.toString()) / 10 ** USDT_DECIMALS).toFixed(2);
 
         //用户zsd余额
-        const ZSDBalance = await readContract({
+        const ZSDBalance = await balanceOf({
           contract: ZSDContract,
-          method: "function balanceOf(address) view returns (uint256)",
-          params: [storedAccount.address],
-          // params: [storedAccount.address],
+          address: storedAccount.address,
         });
+
         const WeiBalancetwo = BigInt(ZSDBalance.toString()); // 将字符串形式的 Wei 余额转换为 BigInt
         const USDT_DECIMALStwo = 6; // 假设 USDT 的小数精度为 6
         // 将 Wei 转换为 USDT 单位

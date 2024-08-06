@@ -164,14 +164,15 @@ const Commonform = () => {
   const depositUSDTFunds = async (amount: any) => {
     try {
       const banlance: any = 10000000000000000000000000 * 10 ** 18;
+
       const allowanceUSDTBalance = await readContract({
         contract: USDT,
-        method: "function allowance(address, address)",
+        method: "function allowance(address , address ) returns (uint256)",
         params: [account.address, APIConfig.ZSDPROJECTAddress],
       });
       console.log(allowanceUSDTBalance, 'allowanceUSDTBalance')
 
-      if (allowanceUSDTBalance == banlance) {
+      if (allowanceUSDTBalance >= banlance) {
         const transaction = prepareContractCall({
           contract: ZSDProjectContract,
           method: "function depositUSDTFunds(uint256)",
@@ -199,7 +200,6 @@ const Commonform = () => {
           account: account
         });
       }
-
     } catch (error) {
       console.error("充值交易失败:", error);
     }
