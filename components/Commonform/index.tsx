@@ -52,6 +52,7 @@ const Commonform = () => {
     client: client,
     address: APIConfig.USDTaddress,
     chain: bsc,
+    abi: contractABI,
   });
 
   //用户必须已经授权本合约从USDT合约划转账务
@@ -163,31 +164,42 @@ const Commonform = () => {
   const depositUSDTFunds = async (amount: any) => {
     try {
       const banlance: any = 10000000000000000000000000 * 10 ** 18;
-      const tx1 = prepareContractCall({
+      const allowanceUSDTBalance = await readContract({
         contract: USDT,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDaddress, banlance],
+        method: "function allowance(address, address)",
+        params: [account.address, APIConfig.ZSDPROJECTAddress],
       });
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account
-      });
-      const transaction = prepareContractCall({
-        contract: ZSDProjectContract,
-        method: "function depositUSDTFunds(uint256)",
-        params: [toWei(amount)],
-      });
+      console.log(allowanceUSDTBalance, 'allowanceUSDTBalance')
 
-      // // 发送交易并等待用户签名确认
-      // const result = await sendTransaction(transaction);
-      // console.log(result, 'resultresultresult')
+      if (allowanceUSDTBalance == banlance) {
+        const transaction = prepareContractCall({
+          contract: ZSDProjectContract,
+          method: "function depositUSDTFunds(uint256)",
+          params: [toWei(amount)],
+        });
 
-      message.info("您的USDT充值成功");
-      formONE.resetFields();
-      setUsdtValue("");
-      setZsdValue("");
-      setToken("");
-      setIsButtonDisabled(true);
+        // 发送交易并等待用户签名确认
+        const result = await sendTransaction(transaction);
+        console.log(result, 'resultresultresult')
+
+        message.info("您的USDT充值成功");
+        formONE.resetFields();
+        setUsdtValue("");
+        setZsdValue("");
+        setToken("");
+        setIsButtonDisabled(true);
+      } else {
+        const tx1 = prepareContractCall({
+          contract: USDT,
+          method: "function approve(address, uint256) returns (bool)",
+          params: [APIConfig.ZSDPROJECTAddress, banlance],
+        });
+        const tx1Result = await sendAndConfirmTransaction({
+          transaction: tx1,
+          account: account
+        });
+      }
+
     } catch (error) {
       console.error("充值交易失败:", error);
     }
