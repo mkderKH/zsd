@@ -192,6 +192,7 @@ const CallWallet = () => {
     const Inviteaddress: any = params.get("ref");
 
     try {
+      debugger
       const registerTX = prepareContractCall({
         contract: ZSDProjectfun,
         method: "function register(address)",

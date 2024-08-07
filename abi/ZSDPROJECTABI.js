@@ -10,6 +10,7 @@ export const ZSDPROJECTABI = [
   {
     anonymous: false,
     inputs: [
+      { indexed: true, internalType: "address", name: "user", type: "address" },
       {
         indexed: true,
         internalType: "uint256",
@@ -149,14 +150,14 @@ export const ZSDPROJECTABI = [
   },
   {
     inputs: [],
-    name: "projectUSDTPool",
+    name: "projectAdminTPool",
     outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
-    name: "projectZSDTPool",
+    name: "projectDropPool",
     outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",

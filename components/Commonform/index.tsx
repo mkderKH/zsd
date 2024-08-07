@@ -151,7 +151,7 @@ const Commonform = () => {
       const tx1 = prepareContractCall({
         contract: USDT,
         method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDaddress, banlance],
+        params: [APIConfig.ZSDPROJECTAddress, banlance],
       });
       const tx1Result = await sendAndConfirmTransaction({
         transaction: tx1,
@@ -178,7 +178,7 @@ const Commonform = () => {
   const depositZSDFunds = async (amount: any) => {
     try {
       const banlance: any = 10000000000000000000000000 * 10 ** 18
-      const amountStr = amount * 10 ** 18;
+      const amountStr: any = amount * 10 ** 18;
       // 第一次授权
       const tx1 = prepareContractCall({
         contract: USDT,
@@ -203,12 +203,13 @@ const Commonform = () => {
       const tx3 = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTANDZSDFunds(uint256)",
-        params: [BigInt(amountStr)],
+        params: [amountStr],
       });
       const result = await sendAndConfirmTransaction({
         transaction: tx3,
         account: account
       });
+
       form.resetFields();
       setUsdtValue("");
       setZsdValue("");
@@ -232,7 +233,7 @@ const Commonform = () => {
           const tx1 = prepareContractCall({
             contract: USDT,
             method: "function approve(address, uint256) returns (bool)",
-            params: [APIConfig.ZSDaddress, banlance],
+            params: [APIConfig.ZSDPROJECTAddress, banlance],
           });
           const tx1Result = await sendAndConfirmTransaction({
             transaction: tx1,

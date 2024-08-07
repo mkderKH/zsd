@@ -238,7 +238,7 @@ const Commonform = () => {
           params: [BigInt(1000000000000000000)],
         });
         const WeiBalanceone: any = USDtoZSDnum.toString();
-
+        // debugger;
         // *************************************************************************查询个人中心*****************************************************************************
         const ComputingPower = await readContract({
           contract: ZSDContractPoject,
