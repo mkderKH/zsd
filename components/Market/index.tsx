@@ -48,7 +48,7 @@ const Market = () => {
         coingeckoId: "bitcoin",
         image: "https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/coin.png",
         marketCap: 5040000,
-        name: "zsd",
+        name: "Zsd",
         price: 0.0030001,
         priceChangePercentage1H: 1.0204692461855924,
         priceChangePercentage7D: -19.93160601388554,
@@ -174,13 +174,13 @@ const Market = () => {
               <div>
                 <div className={styles.currencyName}>{currency.name}</div>
                 <div className={styles.currencyMarketCap}>
-                  ${(currency.name == 'zsd' ? 5040000 : currency.marketCap / 1e9).toFixed(2)}B
+                  ${(currency.name == 'Zsd' ? 5040000 : currency.marketCap / 1e9).toFixed(2)}B
                 </div>
               </div>
             </div>
 
             <div className={styles.currencyPrice}>
-              ${currency.name == 'zsd' ? 0.0030056 : currency.price.toFixed(2)}
+              ${currency.name == 'Zsd' ? 0.0030056 : currency.price.toFixed(2)}
             </div>
             <div
               className={styles.currencyChange}
@@ -190,7 +190,7 @@ const Market = () => {
               }}
             >
               {currency.priceChangePercentage24H >= 0 ? "+" : "-"}
-              {currency.name == 'zsd' ? 0.05 : currency.priceChangePercentage24H.toFixed(2)}%
+              {currency.name == 'Zsd' ? 0.05 : currency.priceChangePercentage24H.toFixed(2)}%
             </div>
           </div>
         ))}

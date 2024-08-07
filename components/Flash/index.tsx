@@ -22,18 +22,19 @@ import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
-import { info } from "console";
+const contractZSDPROJECTABI: any = ZSDPROJECTABI;
+
 
 const USDTAbinew: any = USDTAbi;
-const ZSDNewABI: any = ZSDABI;
 const contractwapABI: any = ZSDSwapABI;
-const contractROJECTABI: any = ZSDPROJECTABI;
+const ZSDabi: any = ZSDABI;
 
 //USDT
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
   chain: bsc,
+  abi: USDTAbinew,
 });
 
 //ZSDSWAP
@@ -47,9 +48,17 @@ const ZSDSWAPContract = getContract({
 const ZSD = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  abi: ZSDNewABI,
+  abi: ZSDabi,
   chain: bsc,
 });
+
+const ZSDProjectContract = getContract({
+  client: client,
+  address: APIConfig.ZSDPROJECTAddress,
+  abi: contractZSDPROJECTABI,
+  chain: bsc,
+});
+
 
 const { Option } = Select;
 const Commonform = () => {
@@ -87,72 +96,83 @@ const Commonform = () => {
   };
 
   const onFinish = async (values: any) => {
+    console.log(values.USDT_one_amount, 'valuesvaluesvalues')
     try {
-      const allowanceUSDTBalance = await allowance({
+      const ZSDBalance = await balanceOf({
         contract: ZSD,
-        owner: account.address,
-        spender: "0x1b4a03f2f80d842b28582252ab9b1d32a4840400"
+        address: account.address
       });
+      // 查询账户ZSD数量
+      const WeiBalancetwo = BigInt(ZSDBalance.toString());
+      const USDT_DECIMALStwo = 6;
+      const usdtBalancetwo =
+        WeiBalancetwo / BigInt(10 ** (18 - USDT_DECIMALStwo));
+      const Compare = parseFloat(usdtBalancetwo.toString());
+      const formattedBalancetwo = Compare == 0 ? Compare : (parseFloat(usdtBalancetwo.toString()) / 10 ** USDT_DECIMALStwo).toFixed(2);
 
-      // 查询币是否足够兑换
-      // if (Number(allowanceUSDTBalance.toString()) <= 0) {
-      //   message.info("您的账户ZSD余额不足,无法进行兑换！");
-      //   return
+      // 账户ZSD数量是否足够兑换USDT
+      if (Number(formattedBalancetwo) <= 0) {
+        message.info("您的账户ZSD余额不足,无法进行兑换！");
+        return
+      }
+
+      // 查询账户限额
+      // const allowanceUSDTBalance = await allowance({
+      //   contract: ZSD,
+      //   owner: account.address,
+      //   spender: "0x1b4a03f2f80d842b28582252ab9b1d32a4840400"
+      // });
+
+      //若当前限额存在
+      // if (allowanceUSDTBalance) {
+      //   const transaction = prepareContractCall({
+      //     contract: ZSD,
+      //     method: "function approve(address, uint256) returns (bool)",
+      //     params: ['0x1b4a03f2f80d842b28582252ab9b1d32a4840400', 10000000000000000000000000n],
+      //   });
+      //   // 用户将usdt转给zsd合约
+      //   const tx1Result = await sendAndConfirmTransaction({
+      //     transaction: transaction,
+      //     account: account,
+      //   });
       // }
 
-      //当前账户zsd限额小于10000000000
-    if (allowanceUSDTBalance.toString()) {
-        // const transaction = await approve({
-        //   contract: ZSD,
-        //   amount: "10000000000000000000000000",
-        //   spender: '0x1b4a03f2f80d842b28582252ab9b1d32a4840400',
-        // });
-        // // 用户将usdt转给zsd合约
+      const banlance: any = 10000000000000000000000000 * 10 ** 18
+      const amountStr = values.USDT_one_amount * 10 ** 18;
 
-        const transaction = prepareContractCall({
-          contract: ZSD,
-          method: "function approve(address, uint256) returns (bool)",
-          params: ['0x1b4a03f2f80d842b28582252ab9b1d32a4840400', 10000000000000000000000000n],
-        });
-
-       // const hash = await sendTransaction({ transaction, account });
-      // 用户将usdt转给zsd合约
+      // 第一次授权
+      const tx1 = prepareContractCall({
+        contract: USDTContract,
+        method: "function approve(address, uint256) returns (bool)",
+        params: [APIConfig.ZSDSwapAddress, banlance],
+      });
       const tx1Result = await sendAndConfirmTransaction({
-        transaction: transaction,
-        account: account,
+        transaction: tx1,
+        account: account
       });
 
-        console.log(tx1Result, 'tx1Result')
+      // 第二次授权
+      const tx2 = prepareContractCall({
+        contract: ZSD,
+        method: "function approve(address, uint256) returns (bool)",
+        params: [APIConfig.ZSDSwapAddress, banlance],
+      });
+      const tx1Result1 = await sendAndConfirmTransaction({
+        transaction: tx2,
+        account: account
+      });
 
-    }
-
-      // console.log(values.ZSD_two_amount, '=================')
-      // const decimals = 18;
-      // const amountInMinimumUnits = values.ZSD_two_amount * Math.pow(10, decimals);
-      // // 使用BigNumber进行精确计算
-      // const BN = require('bignumber.js');
-      // const amountBN = new BN(amountInMinimumUnits.toString());
-      // console.log(amountBN.toFixed(0), '====================')
-
-
-
-      // 兑换
-      // debugger
-
-      let number: any =  values.ZSD_two_amount * 10 **18;
-      const transaction = prepareContractCall({
+        debugger
+      // 发送交易并等待用户签名确认
+      const tx3 = prepareContractCall({
         contract: ZSDSWAPContract,
         method: "function zsdtTokenTousdtTokenSwap(uint256 amountzsdtToken)",
-        params: [number],
+        params: [BigInt(amountStr)]
       });
-      //const result = await sendTransaction(transaction);
-
-      const registerTXResult = await sendAndConfirmTransaction({
-        transaction: transaction,
-        account: account.address,
+      const result = await sendAndConfirmTransaction({
+        transaction: tx3,
+        account: account
       });
-
-      console.log(registerTXResult, 'resultresultresult',);
     } catch (error) {
       console.error("未能成功兑换USDT:", error);
     }

@@ -130,97 +130,97 @@ const CallWallet = () => {
 
 
   // 输入邀请链接
-  // const onFriendRechargeFun = async () => {
-  //   const values = form.getFieldsValue();
-  //   const Inviteaddress: any = values.Invitelink.split(' ').join('')
-  //   // const values = form.getFieldsValue();
-  //   // const search = values.Invitelink;
-  //   // const params = new URLSearchParams(new URL(search).search);
-  //   // const Inviteaddress: any = params.get('ref');
+  const onFriendRechargeFun = async () => {
+    const values = form.getFieldsValue();
+    const Inviteaddress: any = values.Invitelink.split(' ').join('')
+    // const values = form.getFieldsValue();
+    // const search = values.Invitelink;
+    // const params = new URLSearchParams(new URL(search).search);
+    // const Inviteaddress: any = params.get('ref');
 
-  //   try {
-  //     const registerTX = prepareContractCall({
-  //       contract: ZSDContract,
-  //       method: "function register(address)",
-  //       params: [Inviteaddress],
-  //     });
-  //     const registerTXResult = await sendAndConfirmTransaction({
-  //       transaction: registerTX,
-  //       account: account,
-  //     });
+    try {
+      const registerTX = prepareContractCall({
+        contract: ZSDContract,
+        method: "function register(address)",
+        params: [Inviteaddress],
+      });
+      const registerTXResult = await sendAndConfirmTransaction({
+        transaction: registerTX,
+        account: account,
+      });
 
-  //     // *********************************************************登录后授权*********************************************************************
-  //     //用户USDT的余额
-  //     const USDTBalance = await readContract({
-  //       contract: USDT,
-  //       method: "function balanceOf(address) view returns (uint256)",
-  //       params: [account.address],
-  //     });
+      // *********************************************************登录后授权*********************************************************************
+      //用户USDT的余额
+      const USDTBalance = await readContract({
+        contract: USDT,
+        method: "function balanceOf(address) view returns (uint256)",
+        params: [account.address],
+      });
 
-  //     // if (USDTBalance == 0) {
-  //     //   message.info("USDT余额为0，请充值USDT");
-  //     //   return;
-  //     // }
+      // if (USDTBalance == 0) {
+      //   message.info("USDT余额为0，请充值USDT");
+      //   return;
+      // }
 
-  //     const allowanceUSDTBalance = await readContract({
-  //       contract: USDT,
-  //       method: "function allowance(address, address)",
-  //       params: [account.address, APIConfig.ZSDPROJECTAddress],
-  //     });
+      const allowanceUSDTBalance = await readContract({
+        contract: USDT,
+        method: "function allowance(address, address)",
+        params: [account.address, APIConfig.ZSDPROJECTAddress],
+      });
 
-  //     if (allowanceUSDTBalance == 0) {
-  //       message.info("请授权ZSD合约使用您的USDT");
-  //       return;
-  //     }
-  //     //zsd合约有权限调用用户 balance的资产 ||  用户将自己的 USDT转出banlance的权限赋予zsd合约
-  //     const banlance: any = 10000000000000000000000000 * 10 ** 18;
-  //     const tx1 = prepareContractCall({
-  //       contract: USDT,
-  //       method: "function approve(address, uint256) returns (bool)",
-  //       params: [APIConfig.ZSDPROJECTAddress, banlance],
-  //     });
+      if (allowanceUSDTBalance == 0) {
+        message.info("请授权ZSD合约使用您的USDT");
+        return;
+      }
+      //zsd合约有权限调用用户 balance的资产 ||  用户将自己的 USDT转出banlance的权限赋予zsd合约
+      const banlance: any = 10000000000000000000000000 * 10 ** 18;
+      const tx1 = prepareContractCall({
+        contract: USDT,
+        method: "function approve(address, uint256) returns (bool)",
+        params: [APIConfig.ZSDPROJECTAddress, banlance],
+      });
 
-  //     // 用户将usdt转给zsd合约
-  //     const tx1Result = await sendAndConfirmTransaction({
-  //       transaction: tx1,
-  //       account: account,
-  //     });
+      // 用户将usdt转给zsd合约
+      const tx1Result = await sendAndConfirmTransaction({
+        transaction: tx1,
+        account: account,
+      });
 
-  //   } catch (error: any) {
-  //     const firstLine = error.toString().split("\n")[0];
-  //     const match = firstLine.match(/TransactionError: Error - (.+)/);
-  //     if (match && match[1]) {
-  //       switch (match[1]) {
-  //         case "referrer has not deposited":
-  //           message.info("邀请人必须已经投资过");
-  //           break;
-  //         case "User already registered":
-  //           message.info("邀请用户未注册");
-  //           break;
-  //         case "You cannot refer":
-  //           message.info("邀请人和用户不是同一个人");
-  //           break;
-  //         default:
-  //           message.error("发生未知错误");
-  //           break;
-  //       }
-  //       setIsModalOpen(true);
-  //     } else if (error instanceof TypeError) {
-  //       if (
-  //         error.message.includes("Cannot read properties of null (reading '1')")
-  //       ) {
-  //         message.error("发生错误：尝试读取 null 对象的属性");
-  //         setIsModalOpen(true);
-  //       } else {
-  //         message.error("发生类型错误");
-  //         setIsModalOpen(true);
-  //       }
-  //     } else {
-  //       message.error("输入错误，请输入正确的邀请人地址");
-  //       setIsModalOpen(true);
-  //     }
-  //   }
-  // };
+    } catch (error: any) {
+      const firstLine = error.toString().split("\n")[0];
+      const match = firstLine.match(/TransactionError: Error - (.+)/);
+      if (match && match[1]) {
+        switch (match[1]) {
+          case "referrer has not deposited":
+            message.info("邀请人必须已经投资过");
+            break;
+          case "User already registered":
+            message.info("邀请用户未注册");
+            break;
+          case "You cannot refer":
+            message.info("邀请人和用户不是同一个人");
+            break;
+          default:
+            message.error("发生未知错误");
+            break;
+        }
+        setIsModalOpen(true);
+      } else if (error instanceof TypeError) {
+        if (
+          error.message.includes("Cannot read properties of null (reading '1')")
+        ) {
+          message.error("发生错误：尝试读取 null 对象的属性");
+          setIsModalOpen(true);
+        } else {
+          message.error("发生类型错误");
+          setIsModalOpen(true);
+        }
+      } else {
+        message.error("输入错误，请输入正确的邀请人地址");
+        setIsModalOpen(true);
+      }
+    }
+  };
 
   // 判断用户是否登录
   const WhetherInviteUsers = async () => {
@@ -328,7 +328,7 @@ const CallWallet = () => {
               <Button
                 className={styles.verifystyle}
                 htmlType="submit"
-              // onClick={onFriendRechargeFun}
+                onClick={onFriendRechargeFun}
               >
                 确认
               </Button>
