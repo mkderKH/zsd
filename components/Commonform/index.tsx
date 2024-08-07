@@ -203,13 +203,12 @@ const Commonform = () => {
       const tx3 = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTANDZSDFunds(uint256)",
-        params: [amountStr],
+        params: [BigInt(amountStr)],
       });
       const result = await sendAndConfirmTransaction({
         transaction: tx3,
         account: account
       });
-
       form.resetFields();
       setUsdtValue("");
       setZsdValue("");
@@ -244,6 +243,8 @@ const Commonform = () => {
             method: "function addusdt(address,uint256)",
             params: [valuesmodal.RechargeAddress, BigInt(amount2)]
           });
+
+          console.log(transaction, '======================');
           // 发送交易并等待用户签名确认
           const result = await sendTransaction(transaction);
           formONE.resetFields();
@@ -388,11 +389,17 @@ const Commonform = () => {
                 />
               </Form.Item>
             </Col>
-
+            <Col span={24}>
+              <div className={styles.labelContainer}>
+                <span className={styles.labelLeft}>算力</span>
+                <span className={styles.labelRight}> </span>
+              </div>
+            </Col>
             <Col span={24}>
               <Form.Item
                 colon={false}
                 name="ComputingPower_USDT"
+              // label="算力"
               >
                 <Input
                   placeholder="请输入充入算力"
@@ -418,7 +425,7 @@ const Commonform = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Row>
+          {/* <Row>
             <Col span={24}>
               <Form.Item>
                 <Button
@@ -432,7 +439,7 @@ const Commonform = () => {
                 </Button>
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
       </div>
 
@@ -487,9 +494,16 @@ const Commonform = () => {
               </Form.Item>
             </Col>
             <Col span={24}>
+              <div className={styles.labelContainer}>
+                <span className={styles.labelLeft}>算力</span>
+                <span className={styles.labelRight}> </span>
+              </div>
+            </Col>
+            <Col span={24}>
               <Form.Item
                 colon={false}
                 name="ComputingPower_ZSD"
+              // label="算力"
               >
                 <Input
                   placeholder="请输入充入算力"
@@ -525,7 +539,7 @@ const Commonform = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Row>
+          {/* <Row>
             <Col span={24}>
               <Form.Item>
                 <Button
@@ -539,7 +553,7 @@ const Commonform = () => {
                 </Button>
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
       </div>
 
