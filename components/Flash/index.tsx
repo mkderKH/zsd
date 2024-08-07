@@ -5,17 +5,14 @@ import {
   createThirdwebClient,
   getContract,
   prepareContractCall,
-  toWei,
   readContract,
   sendAndConfirmTransaction,
 } from "thirdweb";
 import { useSendTransaction, useActiveAccount } from "thirdweb/react";
-import { approve, allowance, balanceOf } from "thirdweb/extensions/erc20";
+import { balanceOf } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
-
-// 导入API配置
 import { APIConfig } from "../../abi/APIConfiguration";
 import { bsc } from "thirdweb/chains";
 import { USDTAbi } from "../../abi/USDTAbi";
@@ -23,7 +20,6 @@ import { ZSDABI } from "../../abi/ZSDABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
 const contractZSDPROJECTABI: any = ZSDPROJECTABI;
-
 
 const USDTAbinew: any = USDTAbi;
 const contractwapABI: any = ZSDSwapABI;
@@ -52,14 +48,6 @@ const ZSD = getContract({
   chain: bsc,
 });
 
-const ZSDProjectContract = getContract({
-  client: client,
-  address: APIConfig.ZSDPROJECTAddress,
-  abi: contractZSDPROJECTABI,
-  chain: bsc,
-});
-
-
 const { Option } = Select;
 const Commonform = () => {
   const [form] = Form.useForm();
@@ -80,7 +68,6 @@ const Commonform = () => {
       <Option value="USDT">USDT</Option>
     </Select>
   );
-
   const USDtoZSDnumFun = async () => {
     try {
       const USDtoZSDnum = await readContract({
@@ -96,7 +83,6 @@ const Commonform = () => {
   };
 
   const onFinish = async (values: any) => {
-    console.log(values.USDT_one_amount, 'valuesvaluesvalues')
     try {
       const ZSDBalance = await balanceOf({
         contract: ZSD,
@@ -115,27 +101,6 @@ const Commonform = () => {
         message.info("您的账户ZSD余额不足,无法进行兑换！");
         return
       }
-
-      // 查询账户限额
-      // const allowanceUSDTBalance = await allowance({
-      //   contract: ZSD,
-      //   owner: account.address,
-      //   spender: "0x1b4a03f2f80d842b28582252ab9b1d32a4840400"
-      // });
-
-      //若当前限额存在
-      // if (allowanceUSDTBalance) {
-      //   const transaction = prepareContractCall({
-      //     contract: ZSD,
-      //     method: "function approve(address, uint256) returns (bool)",
-      //     params: ['0x1b4a03f2f80d842b28582252ab9b1d32a4840400', 10000000000000000000000000n],
-      //   });
-      //   // 用户将usdt转给zsd合约
-      //   const tx1Result = await sendAndConfirmTransaction({
-      //     transaction: transaction,
-      //     account: account,
-      //   });
-      // }
 
       const banlance: any = 10000000000000000000000000 * 10 ** 18
       const amountStr = values.USDT_one_amount * 10 ** 18;
@@ -162,7 +127,6 @@ const Commonform = () => {
         account: account
       });
 
-        debugger
       // 发送交易并等待用户签名确认
       const tx3 = prepareContractCall({
         contract: ZSDSWAPContract,
@@ -200,7 +164,6 @@ const Commonform = () => {
   useEffect(() => {
     USDtoZSDnumFun()
   }, []);
-
   return (
     <>
       <div className={styles.Content}>

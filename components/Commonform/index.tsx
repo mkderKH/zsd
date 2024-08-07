@@ -4,22 +4,17 @@ import {
   getContract,
   createThirdwebClient,
   prepareContractCall,
-  toWei,
   readContract,
   sendAndConfirmTransaction,
-  toEther,
 } from "thirdweb";
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
-import { Button, Form, Input, Row, Col, Modal, message } from "antd";
-import { approve, balanceOf } from "thirdweb/extensions/erc20";
-// import { bscTestnet } from "thirdweb/chains";  //测试网
-import { bsc } from "thirdweb/chains"; //主网
+import { Button, Form, Input, Row, Col, Modal } from "antd";
+import { bsc } from "thirdweb/chains";
 import { APIConfig } from "../../abi/APIConfiguration";
-
-import { USDTAbi } from "../../abi/USDTAbi";//USDTABI
-import { ZSDABI } from "../../abi/ZSDABI";  //ZSDABI
-import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";  //ZSDPROJECTABI
-import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
+import { USDTAbi } from "../../abi/USDTAbi";
+import { ZSDABI } from "../../abi/ZSDABI";
+import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
+import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
 
 import styles from "./index.module.scss";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
@@ -78,7 +73,6 @@ const Commonform = () => {
 
   const handleUsdtChange = (value: any) => {
     let Test = (value * 2) + (value / 3 * 7) * 3
-
     form.setFieldsValue({ ComputingPower_ZSD: Test });//将算力给到算力输入框
     setZsdprice(Test) //实时计算算力
 
@@ -107,7 +101,6 @@ const Commonform = () => {
       return;
     }
     const zsdCalculated = Number(((numberValue * 7) / 3).toFixed(2));
-
     setUsdtValue(trimmedValue);
     setZsdValue(zsdCalculated);
     const tokenValue = zsdCalculated * price / 10 ** 18;
@@ -115,7 +108,6 @@ const Commonform = () => {
     form.setFieldsValue({ zsdAddress: tokenValue });
   };
 
-  // 处理zsd
   const ZSDChange = (value: any) => {
     const trimmedValue = value;
     if (trimmedValue === "") {
@@ -133,7 +125,6 @@ const Commonform = () => {
       return;
     }
     const zsdCalculated = Number(((numberValue * 7) / 3).toFixed(2));
-
     setUsdtValue(trimmedValue);
     setZsdValue(zsdCalculated);
     const tokenValue = zsdCalculated * price / 10 ** 18;
@@ -141,12 +132,10 @@ const Commonform = () => {
     form.setFieldsValue({ zsdAddress: tokenValue });
   };
 
-  // 处理 ZSD 输入框的变化
   const handleZsdChange = (value: string) => {
     const usdtCalculated = ((parseFloat(value) * 3) / 7).toFixed(2);
     setZsdValue(value);
     setUsdtValue(usdtCalculated);
-    // 更新表单字段的值
     form.setFieldsValue({ usdtInput: usdtCalculated });
   };
 
@@ -303,7 +292,6 @@ const Commonform = () => {
             transaction: tx3,
             account: account
           });
-
           form.resetFields();
           setUsdtValue("");
           setZsdValue("");
@@ -322,7 +310,6 @@ const Commonform = () => {
 
   // 充值操作
   const onFinish = async (values: any) => {
-    // 充值USDT
     if (values.USDT_one_SingleCharge) {
       try {
         if (values.USDT_one_SingleCharge) {
@@ -355,7 +342,6 @@ const Commonform = () => {
 
   useEffect(() => {
     USDtoZSDnumFun()
-
     form.setFieldsValue({
       usdtInput: usdtValue,
       zsdAddress: token,
@@ -388,7 +374,6 @@ const Commonform = () => {
                   className={styles.inputstyle}
                   onChange={(e: any) => {
                     formONE.setFieldsValue({ ComputingPower_USDT: e.target.value * 2 }); // 更新表单字段的值
-
                     setUSDTprice(e.target.value * 2) //实时刷新计算算力
                     setIsButtonDisabled(!e.target.value);
                     setIsButtonDisabledZSD(true); //ZSD
@@ -403,7 +388,6 @@ const Commonform = () => {
               </Form.Item>
             </Col>
 
-            {/* 算力 */}
             <Col span={24}>
               <Form.Item
                 colon={false}
@@ -451,7 +435,6 @@ const Commonform = () => {
         </Form>
       </div>
 
-
       {/* model2 */}
       <div className={styles.Content}>
         <Form
@@ -487,7 +470,6 @@ const Commonform = () => {
             <Col span={24}>
               <div className={styles.labelContainer}>
                 <span className={styles.labelLeft}>ZSD</span>
-                {/* 当前zsd的价格 */}
                 <span className={styles.labelRight}>ZSD: {price / 10 ** 18}</span>
               </div>
             </Col>
@@ -503,7 +485,6 @@ const Commonform = () => {
                 />
               </Form.Item>
             </Col>
-            {/* 算力 */}
             <Col span={24}>
               <Form.Item
                 colon={false}
@@ -515,7 +496,6 @@ const Commonform = () => {
                   onChange={(e: any) => {
                     setZsdprice(e.target.value);
                     setUsdtValue(Number(e.target.value) / 9)
-                    // 反推USDT+ZSDT
                     ZSDChange(Number(e.target.value) / 9)
                   }}
                 />
@@ -531,7 +511,6 @@ const Commonform = () => {
               <span className={styles.Ustyle}>USDT</span>
             </Col>
           </Row>
-
           <Row>
             <Col span={24}>
               <Form.Item>

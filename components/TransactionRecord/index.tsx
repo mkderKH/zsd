@@ -3,21 +3,14 @@ import React, { useState, useEffect } from "react";
 import {
   createThirdwebClient,
 } from "thirdweb";
-import { Button, Form, Row, Col } from "antd";
-import { approve, balanceOf } from "thirdweb/extensions/erc20";
-import styles from "./index.module.scss";
+import { getRpcClient, eth_blockNumber } from "thirdweb/rpc";
 import { useActiveAccount } from "thirdweb/react";
-import { getRpcClient, eth_blockNumber, eth_getLogs } from "thirdweb/rpc";
+import styles from "./index.module.scss";
 import axios from "axios";
-
-
-// 初始化
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
-
-// 导入API配置
 import { APIConfig } from "../../abi/APIConfiguration";
-import { bsc } from "thirdweb/chains"; //主网
+import { bsc } from "thirdweb/chains";
 
 const Commonform = () => {
   const [switchingState, setSwitchingState] = useState<any>(1);
@@ -34,7 +27,6 @@ const Commonform = () => {
     const timeStampDecimal = parseInt(timeStampHex, 16);
     // 将 Unix 时间戳转换为 Date 对象
     const date = new Date(timeStampDecimal * 1000);
-
     // 手动构建所需的日期格式
     const formattedDate = [
       date.getFullYear(),
@@ -45,10 +37,8 @@ const Commonform = () => {
         ('0' + date.getHours()).slice(-2),
         ('0' + date.getMinutes()).slice(-2)
       ].join(':');
-
     return formattedDate; // 返回所需的日期格式
   };
-
 
   // 到账金额
   const AmountReceivedFun = (hex: string) => {
@@ -64,18 +54,10 @@ const Commonform = () => {
 
   // 账号
   const ToaccountFun = (hex: string) => {
-    // 判断输入是否为合法的十六进制字符串，长度应为 42 个字符（不包括前缀 "0x"）
-    // if (typeof hex !== 'string' || hex.length !== 42 || !hex.startsWith('0x')) {
-    //   console.error('输入的不是有效的十六进制字符串。');
-    //   return null;
-    // }
-
     // 获取后八位
     let lastEightChars = hex.slice(-8);
-
     // 构建前面的三个星号
     let maskedPart = '***';
-
     // 合并并返回遮蔽后的字符串
     return maskedPart + lastEightChars;
   };
@@ -113,32 +95,23 @@ const Commonform = () => {
       TransactionRecordFun(addressnew)
     }
   }, [account]);
+
   return (
     <>
       <div className={styles.Content}>
         <span className={styles.ContentText}>交易记录</span>
-
-        {/* <div className={styles.Tabsstyle}>
-          <span onClick={() => { ClickToswitch(1) }} style={{ color: (switchingState === 1) ? '#e89e2c' : '#ffffff' }}>直推</span>
-          <span className={styles.teamstyle} onClick={() => { ClickToswitch(2) }} style={{ color: (switchingState === 2) ? '#e89e2c' : '#ffffff' }}>团队</span>
-          <span style={{ color: (switchingState === 3) ? '#e89e2c' : '#ffffff' }} onClick={() => { ClickToswitch(3) }}>滑落</span>
-        </div> */}
-
         {/* 直推 */}
         {
           switchingState == '1' &&
           <div>
             <div className={styles.ComputingPower}>
               <span className={styles.Contentlabel}>总金额/USDT：{totalAmountone}USDT</span>
-              {/* <span className={styles.power}>直推人数：0 人</span> */}
             </div>
-
             <div className={styles.ComputingPower}>
               <span className={styles.AmountReceived}>账号</span>
               <span className={styles.AmountReceived}>到账金额/USDT</span>
               <span className={styles.ArrivalTime}>到账时间</span>
             </div>
-
             <div className={styles.CustomerInformation}>
               {transactionRecord.map((item: any, index: any) => (
                 <div key={index} className={styles.ComputingPowercont}>
@@ -157,11 +130,9 @@ const Commonform = () => {
           <>
             <div className={styles.ComputingPower}>
               <span className={styles.AmountReceived}>账号</span>
-
               <span className={styles.AmountReceived}>到账金额/U</span>
               <span className={styles.ArrivalTime}>到账时间</span>
             </div>
-
             <div className={styles.CustomerInformation}>
               {transactionRecord.map((item: any, index: any) => (
                 <div key={index} className={styles.ComputingPowercont}>
@@ -179,16 +150,13 @@ const Commonform = () => {
           <>
             <div className={styles.ComputingPower}>
               <span className={styles.AmountReceived}>账号</span>
-
               <span className={styles.AmountReceived}>到账金额/U</span>
               <span className={styles.ArrivalTime}>到账时间</span>
             </div>
-
             <div className={styles.CustomerInformation}>
               {transactionRecord.map((item: any, index: any) => (
                 <div key={index} className={styles.ComputingPowercont}>
                   <span className={styles.AmountReceived}>{AmountReceivedFun(item.topics[2])}</span>
-
                   <span className={styles.AmountReceived}>{AmountReceivedFun(item.topics[3])}</span>
                   <span className={styles.ArrivalTime}>{TimeStampFun(item.timeStamp)}</span>
                 </div>

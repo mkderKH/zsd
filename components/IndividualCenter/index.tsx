@@ -5,15 +5,15 @@ import {
   readContract,
   prepareContractCall,
   createThirdwebClient,
-  sendAndConfirmTransaction,
 } from "thirdweb";
 import Web3 from 'web3';
 
-import { Button, Form, Input, Row, Col, Modal } from "antd";
+import { Button, Form, Row, Col, Modal } from "antd";
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
-import { approve, balanceOf } from "thirdweb/extensions/erc20";
+import { balanceOf } from "thirdweb/extensions/erc20";
 import styles from "./index.module.scss";
 import axios from "axios";
+
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 
@@ -23,6 +23,7 @@ import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
 import { getRpcClient, eth_blockNumber, } from "thirdweb/rpc";
 import { bsc } from "thirdweb/chains";
+
 const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
 const contractZSDSwapABI: any = ZSDSwapABI;
@@ -83,15 +84,12 @@ const Commonform = () => {
     try {
       const response = await axios.get(
         `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
-        // `&topic1=0x00000000000000000000000044e83cd293a12fc57b732137488604cb36704a9e&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`//测试
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       // 用于存储转换后数据的数组
       const convertedData = response.data.result.map((item: any) => {
         // 提取topics[3]，去掉前缀'0x'，然后转换为十进制数，除以10**18（假设它是一个以wei表示的以太坊金额）
         const topics3Decimal = parseInt(item.topics[2].slice(2), 16) / (10 ** 18);
-
-
         // 提取timeStamp，转换为十进制
         const timeStampDecimal = parseInt(item.timeStamp, 16);
         // 将Unix时间戳转换为日期
@@ -129,11 +127,6 @@ const Commonform = () => {
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
 
-      // const response = await axios.get(
-      //   `https://api.bscscan.com/api?module=account&action=txlist&address=${addressnew.substring(2).replace(/\s+/g, '')}&to=${APIConfig.ZSDPROJECTAddress}&sort=desc&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
-      // );
-
-
       // 用于存储转换后数据的数组
       const convertedData = response.data.result.map((item: any) => {
         if (item.functionName == "depositUSDTANDZSDFunds(uint256 usdtAmount)") {
@@ -143,8 +136,6 @@ const Commonform = () => {
           const decoded: any = web3.eth.abi.decodeParameters(params, inputData.slice(4));
           const decodedBigInt = BigInt(decoded[0]);
           const decodedStr: any = decodedBigInt.toString()
-          // console.log(decodedStr, '==========================22222222222222');
-
 
           // 将Unix时间戳转换为日期
           const date = new Date(item.timeStamp * 1000);
@@ -174,41 +165,13 @@ const Commonform = () => {
     }
   }
 
-  const onFinish = async (values: any) => {
+  const onFinish = async () => {
     try {
-      //zsd合约有权限调用用户 balance的资产
-      const banlance: any = 10000000000000000000000000 * 10 ** 18;
-
-      //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
-      //用户授权给ZSD合约可操作usdt的余额
-      const allowanceUSDTBalance = await readContract({
-        contract: USDTContract,
-        method: "function allowance(address, address)",
-        params: [storedAccount.address, APIConfig.ZSDaddress],
-      });
-
-      const banlanceone: any = 10000000000000000000000000 * 10 ** 18;
-      //zsd合约有权限调用用户 balance的资产
-      //用户将自己的 将自己usdt转出banlance的权限赋予zsd合约
-      const tx1 = prepareContractCall({
-        contract: USDTContract,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDaddress, banlanceone],
-      });
-      // 用户将usdt转给zsd合约
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: storedAccount,
-      });
-
       const transaction = prepareContractCall({
         contract: ZSDContractPoject,
-        // method: "function withdraZSDFunds(uint256 zsdAmount)",
-        method: "withdraZSDFunds",
+        method: "function withdraZSDFunds()",
         params: [], // 移除参数
       });
-
-      // 发送交易，交易配置对象直接传递给 sendTransaction
       const result = await sendTransaction(transaction);
     } catch (error) {
       console.error("提取失败:", error);
@@ -284,7 +247,6 @@ const Commonform = () => {
         });
         const bigIntNumber1 = ComputingPower[2];
         const bigIntNumber2 = ComputingPower[3];
-
         const computingPowerSecond = Number(bigIntNumber1);
         const computingPowerThird = Number(bigIntNumber2);
         const weiBalanceOne = Number(WeiBalanceone);
@@ -297,7 +259,6 @@ const Commonform = () => {
         let timestamp = now.getTime();
         // 提取计算   ||  当前时间戳  减去  取出来的时间戳  /   86400000（秒） =  时间    （* 0.005 * FinalEffortdata = 提走的币）
         const Withdraw = (((timestamp / 1000 - timestampInMs) / 86400) * 0.005 * FinalEffortdata) * weiBalanceOne / (10 ** 18)
-
         setTransactionRecord(Withdraw)
         // 最终算力
         setFinalEffort(FinalEffortdata);

@@ -3,12 +3,9 @@ import React, { useState, useEffect } from "react";
 import { message, Modal, Input, Form, Button, Row, Col } from "antd";
 import { createWallet, walletConnect } from "thirdweb/wallets";
 import { ConnectButton } from "thirdweb/react";
-// import { bscTestnet } from "thirdweb/chains"; //测试网
-import { bsc } from "thirdweb/chains";           //主网
+import { bsc } from "thirdweb/chains";
 import { client } from "../../src/app/client";
-// import { Inter } from "next/font/google";
 import type { Metadata } from "next";
-// const inter = Inter({ subsets: ["latin"] });
 import styles from "./index.module.scss";
 
 import {
@@ -18,19 +15,14 @@ import {
   readContract,
   toWei,
 } from "thirdweb";
+import { approve, allowance } from "thirdweb/extensions/erc20";
+import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
 import { APIConfig } from "../../abi/APIConfiguration";
 import { useActiveAccount } from "thirdweb/react";
 import { USDTAbi } from "../../abi/USDTAbi";
-import { ZSDABI } from "../../abi/ZSDABI";  //ZSDABI
-import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";  //ZSDPROJECTABI
-import { approve, allowance, balanceOf } from "thirdweb/extensions/erc20";
 import { sendTransaction } from "thirdweb";
 
-// import { ZSDSwapABI } from "../../abi/ZSDSwapABI";  //ZSDSwapABI
-// const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
-
 const contractABI: any = USDTAbi;
-const contractZSDABI: any = ZSDABI;
 const contractZSDPROJECTABI: any = ZSDPROJECTABI;
 
 export const metadata: Metadata = {
@@ -79,7 +71,6 @@ const USDTContract = getContract({
   chain: bsc,
 });
 
-
 const CallWallet = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [form] = Form.useForm();
@@ -89,45 +80,19 @@ const CallWallet = () => {
     setIsModalOpen(false);
   };
 
-  const disconnectWallet = async (wallet: any) => {
-    try {
-      await wallet.disconnect();
-    } catch (error) {
-      message.error("登出钱包失败，请稍后重试。");
-    }
-  };
-
-  // const handleCancel = async () => {
-  //   try {
-  //     wallets.forEach((wallet: { disconnect: (arg0: any) => void; }) => {
-  //       if (wallet.disconnect) {
-  //         wallet.disconnect(wallet);
-  //       }
-  //     });
-  //     message.error('未填写邀请码，钱包已登出');
-  //     setIsModalOpen(false);
-  //   } catch (error) {
-  //     message.error('登出钱包失败，请重试。');
-  //   }
-  // };
-
   const handleCancel = async () => {
-    if (!wallets || wallets.length === 0) {
-      message.error("没有可登出的钱包");
-      setIsModalOpen(false);
-      return;
-    }
     try {
-      // 使用 Promise.all 来并行处理所有钱包的登出
-      await Promise.all(wallets.map(disconnectWallet));
+      wallets.forEach((wallet: { disconnect: (arg0: any) => void; }) => {
+        if (wallet.disconnect) {
+          wallet.disconnect(wallet);
+        }
+      });
+      message.error('未填写邀请码，钱包已登出');
       setIsModalOpen(false);
-      message.info("未填写邀请码，钱包已登出");
     } catch (error) {
-      // 如果任何一个钱包登出失败，捕获错误并显示消息
-      message.error("登出钱包失败，请重试。");
+      message.error('登出钱包失败，请重试。');
     }
   };
-
 
   // 输入邀请链接
   const onFriendRechargeFun = async () => {
@@ -157,11 +122,6 @@ const CallWallet = () => {
         params: [account.address],
       });
 
-      // if (USDTBalance == 0) {
-      //   message.info("USDT余额为0，请充值USDT");
-      //   return;
-      // }
-
       const allowanceUSDTBalance = await readContract({
         contract: USDT,
         method: "function allowance(address, address)",
@@ -185,7 +145,6 @@ const CallWallet = () => {
         transaction: tx1,
         account: account,
       });
-
     } catch (error: any) {
       const firstLine = error.toString().split("\n")[0];
       const match = firstLine.match(/TransactionError: Error - (.+)/);
@@ -222,11 +181,8 @@ const CallWallet = () => {
     }
   };
 
-  // 判断用户是否登录
+  // 登录后判断用户是否注册
   const WhetherInviteUsers = async () => {
-    console.log(account, 'accountaccountaccountaccountaccount');
-
-
     if (!account) {
       message.error("请登录");
       return;
@@ -246,37 +202,36 @@ const CallWallet = () => {
         account: account,
       });
 
-      // *********************************************************登录后授权*********************************************************************
-      if (registerTXResult) {
-        const balance = toWei('10000000000000000000000000');
-        const allowanceAmount = await allowance({
-          contract: USDT,
-          spender: APIConfig.ZSDPROJECTAddress,
-          owner: account.address,
-        })
+      // 登录后授权
+      // if (registerTXResult) {
+      //   const balance = toWei('10000000000000000000000000');
+      //   const allowanceAmount = await allowance({
+      //     contract: USDT,
+      //     spender: APIConfig.ZSDPROJECTAddress,
+      //     owner: account.address,
+      //   })
 
-        if (toWei(allowanceAmount + '') < balance) {
-          const transaction = await approve({
-            contract: USDTContract,
-            spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
-            amount: balance.toString(),
-          })
+      //   if (toWei(allowanceAmount + '') < balance) {
+      //     const transaction = await approve({
+      //       contract: USDTContract,
+      //       spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
+      //       amount: balance.toString(),
+      //     })
 
-          const hash = await sendTransaction({ transaction, account });
+      //     const hash = await sendTransaction({ transaction, account });
 
-          if (hash.transactionHash) {
-            const tx = await approve({
-              contract: ZSDContract,
-              spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
-              amount: balance.toString(),
-            })
+      //     if (hash.transactionHash) {
+      //       const tx = await approve({
+      //         contract: ZSDContract,
+      //         spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
+      //         amount: balance.toString(),
+      //       })
+      //       // const hash = await sendTransaction({ tx, account });
+      //     }
 
-            // const hash = await sendTransaction({ tx, account });
-          }
-
-        }
-        return;
-      }
+      //   }
+      //   return;
+      // }
     } catch (error: any) {
       const firstLine = error.toString().split("\n")[0];
       const match = firstLine.match(/TransactionError: Error - (.+)/);
@@ -284,6 +239,7 @@ const CallWallet = () => {
         switch (match[1]) {
           case "referrer has not deposited":
             message.info("邀请人没有入金");
+            handleCancel();
             break;
           case "User already registered":
             break;
