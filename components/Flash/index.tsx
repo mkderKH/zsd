@@ -76,6 +76,8 @@ const Commonform = () => {
         params: [BigInt(1000000000000000000)],
       });
       const WeiBalance = USDtoZSDnum.toString();
+
+      console.log(WeiBalance, '=====================');
       SetPrice(WeiBalance)
     } catch (error) {
       console.error("查询失败:", error);
@@ -142,18 +144,18 @@ const Commonform = () => {
     }
   };
 
-  const amountValidator = (rule: any, value: any) => {
-    if (!value) {
-      return Promise.resolve();
-    }
-    const reg = /^[0-9]*$/;
-    if (!reg.test(value)) {
-      return Promise.reject(
-        new Error("请输入有效的数字，不能输入负数和其他字符！")
-      );
-    }
-    return Promise.resolve();
-  };
+  // const amountValidator = (rule: any, value: any) => {
+  //   if (!value) {
+  //     return Promise.resolve();
+  //   }
+  //   const reg = /^[0-9]*$/;
+  //   if (!reg.test(value)) {
+  //     return Promise.reject(
+  //       new Error("请输入有效的数字，不能输入负数和其他字符！")
+  //     );
+  //   }
+  //   return Promise.resolve();
+  // };
 
   useEffect(() => {
     if (account) {
@@ -183,10 +185,10 @@ const Commonform = () => {
                 label={<span className={styles.Contentlabel}>代币兑换</span>}
                 colon={false}
                 name="USDT_one_amount"
-                rules={[
-                  { required: true, message: "请输入充入金额!" },
-                  { validator: amountValidator },
-                ]}
+                // rules={[
+                //   { required: true, message: "请输入充入金额!" },
+                //   { validator: amountValidator },
+                // ]}
               >
                 <Input
                   addonAfter={selectAfterone}
@@ -194,6 +196,7 @@ const Commonform = () => {
                   className={styles.inputstyle}
                   onChange={(e: any) => {
                     const tokenValue = (e.target.value) / price * 10 ** 18;
+
                     form.setFieldsValue({
                       ZSD_two_amount: tokenValue,
                     });
