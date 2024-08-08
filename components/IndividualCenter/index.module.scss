@@ -24,6 +24,9 @@
     border-radius: 5px;
     font-size: 16px;
     color: #45a51a;
+    font-weight: 500;
+    font-size: 16px;
+    font-style: normal;
   }
   .inputstyle {
     background: #d8d8d8;
@@ -96,7 +99,16 @@
   .labelLeft {
     margin-right: auto;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 18px;
+    color: #ffffff;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+  }
+  .labelLeftZSD{
+    margin-right: auto;
+    font-weight: 500;
+    font-size: 18px;
     color: #ffffff;
     line-height: 22px;
     text-align: left;
@@ -105,8 +117,7 @@
   .labelLeftone {
     margin-right: auto;
     font-weight: 500;
-    font-size: 16px;
-    color: #ffffff;
+    font-size: 18px;
     line-height: 22px;
     text-align: left;
     font-style: normal;
@@ -125,7 +136,7 @@
     text-align: justify;
   }
   .CalculatedValue {
-    // text-align: justify;
+    text-align: justify;
     font-weight: 400;
     font-size: 14px;
     color: #d8d8d8;

@@ -7,9 +7,11 @@ import {
   readContract,
   sendAndConfirmTransaction,
 } from "thirdweb";
+
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { Button, Form, Input, Row, Col, Modal } from "antd";
-import { bsc } from "thirdweb/chains";
+// import { bsc } from "thirdweb/chains";
+import { bscTestnet } from "thirdweb/chains";
 import { APIConfig } from "../../abi/APIConfiguration";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
@@ -45,7 +47,7 @@ const Commonform = () => {
   const USDT = getContract({
     client: client,
     address: APIConfig.USDTaddress,
-    chain: bsc,
+    chain: bscTestnet,
     abi: contractABI,
   });
 
@@ -54,21 +56,21 @@ const Commonform = () => {
     client: client,
     address: APIConfig.ZSDaddress,
     abi: contractZSDABI,
-    chain: bsc,
+    chain: bscTestnet,
   });
 
   const ZSDProjectContract = getContract({
     client: client,
     address: APIConfig.ZSDPROJECTAddress,
     abi: contractZSDPROJECTABI,
-    chain: bsc,
+    chain: bscTestnet,
   });
 
   const ZSDSwap = getContract({
     client: client,
     address: APIConfig.ZSDSwapAddress,
     abi: contractZSDSwapABI,
-    chain: bsc,
+    chain: bscTestnet,
   });
 
   const handleUsdtChange = (value: any) => {
@@ -243,10 +245,17 @@ const Commonform = () => {
             method: "function addusdt(address,uint256)",
             params: [valuesmodal.RechargeAddress, BigInt(amount2)]
           });
+          console.log(transaction, 'transaction: ======================', amount2);
 
-          console.log(transaction, '======================');
           // 发送交易并等待用户签名确认
-          const result = await sendTransaction(transaction);
+          // const result = await sendTransaction(transaction);
+
+          const result = await sendAndConfirmTransaction({
+            transaction: transaction,
+            account: account
+          });
+
+          console.log(result, 'result: ======================');
           formONE.resetFields();
           setUsdtValue("");
           setZsdValue("");
@@ -425,7 +434,7 @@ const Commonform = () => {
               </Form.Item>
             </Col>
           </Row>
-          {/* <Row>
+          <Row>
             <Col span={24}>
               <Form.Item>
                 <Button
@@ -439,7 +448,7 @@ const Commonform = () => {
                 </Button>
               </Form.Item>
             </Col>
-          </Row> */}
+          </Row>
         </Form>
       </div>
 
@@ -539,7 +548,7 @@ const Commonform = () => {
               </Form.Item>
             </Col>
           </Row>
-          {/* <Row>
+          <Row>
             <Col span={24}>
               <Form.Item>
                 <Button
@@ -553,7 +562,7 @@ const Commonform = () => {
                 </Button>
               </Form.Item>
             </Col>
-          </Row> */}
+          </Row>
         </Form>
       </div>
 

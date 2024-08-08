@@ -14,7 +14,8 @@ import styles from "./index.module.scss";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 import { APIConfig } from "../../abi/APIConfiguration";
-import { bsc } from "thirdweb/chains";
+// import { bsc } from "thirdweb/chains";
+import { bscTestnet } from "thirdweb/chains";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
@@ -29,7 +30,7 @@ const ZSDabi: any = ZSDABI;
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bsc,
+  chain: bscTestnet,
   abi: USDTAbinew,
 });
 
@@ -38,14 +39,14 @@ const ZSDSWAPContract = getContract({
   client: client,
   address: APIConfig.ZSDSwapAddress,
   abi: contractwapABI,
-  chain: bsc,
+  chain: bscTestnet,
 });
 
 const ZSD = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
   abi: ZSDabi,
-  chain: bsc,
+  chain: bscTestnet,
 });
 
 const { Option } = Select;
@@ -55,7 +56,6 @@ const Commonform = () => {
   const { mutate: sendTransaction, isPending } = useSendTransaction();
   const [price, SetPrice] = useState<any>(0);
   const [priceAccount, SetPriceAccount] = useState<any>(0);
-
 
   const selectAfterone = (
     <Select defaultValue="ZSD" className="select-after">
@@ -68,6 +68,7 @@ const Commonform = () => {
       <Option value="USDT">USDT</Option>
     </Select>
   );
+
   const USDtoZSDnumFun = async () => {
     try {
       const USDtoZSDnum = await readContract({

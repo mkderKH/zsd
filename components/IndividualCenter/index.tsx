@@ -22,8 +22,8 @@ import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
 import { getRpcClient, eth_blockNumber, } from "thirdweb/rpc";
-import { bsc } from "thirdweb/chains";
-
+// import { bsc } from "thirdweb/chains";
+import { bscTestnet } from "thirdweb/chains";
 const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
 const contractZSDSwapABI: any = ZSDSwapABI;
@@ -32,21 +32,21 @@ const contractZSDSwapABI: any = ZSDSwapABI;
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bsc,
+  chain: bscTestnet,
 });
 
 //用户必须已经授权本合约从USDT合约划转账务
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  chain: bsc,
+  chain: bscTestnet,
   abi: contractABI,
 });
 
 const ZSDContractPoject = getContract({
   client: client,
   address: APIConfig.ZSDPROJECTAddress,
-  chain: bsc,
+  chain: bscTestnet,
   abi: ZSDContractABI,
 });
 
@@ -54,7 +54,7 @@ const ZSDSwap = getContract({
   client: client,
   address: APIConfig.ZSDSwapAddress,
   abi: contractZSDSwapABI,
-  chain: bsc,
+  chain: bscTestnet,
 });
 
 const Commonform = () => {
@@ -79,11 +79,11 @@ const Commonform = () => {
 
   // 查询交易记录
   const TransactionRecordFun = async (addressnew: any) => {
-    const rpcRequest = getRpcClient({ client, chain: bsc });
+    const rpcRequest = getRpcClient({ client, chain: bscTestnet });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
-        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
+        `https://api.bscTestnet.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       // 用于存储转换后数据的数组
@@ -119,11 +119,11 @@ const Commonform = () => {
   }
 
   const TransactionZSDRecordFun = async (addressnew: any) => {
-    const rpcRequest = getRpcClient({ client, chain: bsc });
+    const rpcRequest = getRpcClient({ client, chain: bscTestnet });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
-        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
+        `https://api.bscTestnet.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
 
@@ -131,7 +131,7 @@ const Commonform = () => {
       const convertedData = response.data.result.map((item: any) => {
         if (item.functionName == "depositUSDTANDZSDFunds(uint256 usdtAmount)") {
           const inputData = item.input;
-          const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org/'));
+          const web3 = new Web3(new Web3.providers.HttpProvider('https://bscTestnet-dataseed1.binance.org/'));
           const params = ['uint256'];
           const decoded: any = web3.eth.abi.decodeParameters(params, inputData.slice(4));
           const decodedBigInt = BigInt(decoded[0]);
@@ -338,7 +338,7 @@ const Commonform = () => {
           <Row>
             <Col span={24} className={styles.cost}>
               <span className={styles.CalculatedValue}>
-                当前ZSD价值: <span className={styles.inputstyle3}>1USDT={price / 10 ** 18}ZSD</span>
+                <span className={styles.labelLeftZSD}>当前ZSD价值:  </span> <span className={styles.inputstyle3}>1USDT={(price / 10 ** 18).toFixed(2)}ZSD</span>
               </span>
             </Col>
           </Row>

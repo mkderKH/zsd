@@ -20,6 +20,7 @@
     margin: auto;
     font-style: normal;
     border-bottom: 3px solid #e89e2c;
+    margin-top: 15px;
   }
   .titleContent {
     display: flex;
@@ -43,7 +44,7 @@
   .priceInfo {
     display: flex; /* 使用Flexbox布局 */
     align-items: center; /* 垂直居中对齐 */
-    margin-left: 40px;
+    margin-left: 35px;
   }
   .fluctuateInfo {
     display: flex; /* 使用Flexbox布局 */
@@ -63,8 +64,8 @@
     color: #ffffff;
     line-height: 20px;
     font-style: normal;
+    margin-top: 20px;
   }
-
   .currencyInfo {
     display: flex;
     align-items: center;

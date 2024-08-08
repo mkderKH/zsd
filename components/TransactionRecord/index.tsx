@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
   createThirdwebClient,
 } from "thirdweb";
+import { Empty } from 'antd';
 import { getRpcClient, eth_blockNumber } from "thirdweb/rpc";
 import { useActiveAccount } from "thirdweb/react";
 import styles from "./index.module.scss";
@@ -10,7 +11,9 @@ import axios from "axios";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 import { APIConfig } from "../../abi/APIConfiguration";
-import { bsc } from "thirdweb/chains";
+// import { bsc } from "thirdweb/chains";
+import { bscTestnet } from "thirdweb/chains";
+import { Span } from "next/dist/trace";
 
 const Commonform = () => {
   const [switchingState, setSwitchingState] = useState<any>(1);
@@ -64,11 +67,11 @@ const Commonform = () => {
 
   // 查询交易记录
   const TransactionRecordFun = async (addressnew: any) => {
-    const rpcRequest = getRpcClient({ client, chain: bsc });
+    const rpcRequest = getRpcClient({ client, chain: bscTestnet });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
-        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
+        `https://api.bscTestnet.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       setTransactionRecord(response.data.result);
@@ -97,35 +100,41 @@ const Commonform = () => {
   }, [account]);
 
   return (
-    <>
-      <div className={styles.Content}>
-        <span className={styles.ContentText}>交易记录</span>
-        {/* 直推 */}
-        {
-          switchingState == '1' &&
-          <div>
-            <div className={styles.ComputingPower}>
-              <span className={styles.Contentlabel}>总金额/USDT：{totalAmountone}USDT</span>
-            </div>
-            <div className={styles.ComputingPower}>
-              <span className={styles.AmountReceived}>账号</span>
-              <span className={styles.AmountReceived}>到账金额/USDT</span>
-              <span className={styles.ArrivalTime}>到账时间</span>
-            </div>
-            <div className={styles.CustomerInformation}>
-              {transactionRecord.map((item: any, index: any) => (
+    <div className={styles.Content}>
+      <span className={styles.ContentText}>交易记录</span>
+      {/* 直推 */}
+      {
+        switchingState == '1' &&
+        <div>
+          <div className={styles.ComputingPower}>
+            <span className={styles.Contentlabel}>总金额/USDT：{totalAmountone}USDT</span>
+          </div>
+          <div className={styles.ComputingPower}>
+            <span className={styles.AmountReceived}>账号</span>
+            <span className={styles.AmountReceived}>到账金额/USDT</span>
+            <span className={styles.ArrivalTime}>到账时间</span>
+          </div>
+
+          <div className={styles.CustomerInformation}>
+            {transactionRecord.length > 0 ? (
+              transactionRecord.map((item: any, index: any) => (
                 <div key={index} className={styles.ComputingPowercont}>
                   <span className={styles.AmountReceived}>{ToaccountFun(item.topics[2])}</span>
                   <span className={styles.AmountReceived}>{AmountReceivedFun(item.topics[3])}</span>
                   <span className={styles.ArrivalTime}>{TimeStampFun(item.timeStamp)}</span>
                 </div>
-              ))}
-            </div>
+              ))
+            ) : (
+              <Empty description={
+                <span style={{ color: '#FFFFFF' }}>暂无数据</span>
+              } />
+            )}
           </div>
-        }
+        </div>
+      }
 
-        {/* 团队 */}
-        {
+      {/* 团队 */}
+      {/* {
           switchingState == '2' &&
           <>
             <div className={styles.ComputingPower}>
@@ -142,10 +151,10 @@ const Commonform = () => {
               ))}
             </div>
           </>
-        }
+        } */}
 
-        {/* 滑落 */}
-        {
+      {/* 滑落 */}
+      {/* {
           switchingState == '3' &&
           <>
             <div className={styles.ComputingPower}>
@@ -163,9 +172,8 @@ const Commonform = () => {
               ))}
             </div>
           </>
-        }
-      </div>
-    </>
+        } */}
+    </div>
   );
 };
 

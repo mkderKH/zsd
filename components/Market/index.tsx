@@ -165,7 +165,7 @@ const Market = () => {
           <div key={index} className={styles.currencyItem}>
             <div className={styles.currencyInfo}>
               <Image
-                src={`https://violet-changing-horse-877.mypinata.cloud/ipfs/QmQ2hGZURQqfQ7t47CiBALPTFDip8Jp9HVGHRXXJe7i9C7/${currency.name}.png`}
+                src={`https://violet-changing-horse-877.mypinata.cloud/ipfs/QmZUpyn6s8VTydE5sCsSF8ZP6NqZ8jK9ic5ZEeDLoCncYR/${currency.name}.png`}
                 alt={currency.name}
                 className={styles.btnIcon}
                 width={48}
@@ -185,11 +185,12 @@ const Market = () => {
             <div
               className={styles.currencyChange}
               style={{
+                marginTop: 20,
                 color:
                   currency.priceChangePercentage24H >= 0 ? "#52B05AFF" : "#EF2517"
               }}
             >
-              {currency.priceChangePercentage24H >= 0 ? "+" : "-"}
+              {currency.priceChangePercentage24H >= 0 ? "+" : " "}
               {currency.name == 'Zsd' ? 0.05 : currency.priceChangePercentage24H.toFixed(2)}%
             </div>
           </div>

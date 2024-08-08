@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { message, Modal, Input, Form, Button, Row, Col } from "antd";
 import { createWallet, walletConnect } from "thirdweb/wallets";
 import { ConnectButton } from "thirdweb/react";
-import { bsc } from "thirdweb/chains";
+// import { bscTestnet } from "thirdweb/chains";
+import { bscTestnet } from "thirdweb/chains";
 import { client } from "../../src/app/client";
 import type { Metadata } from "next";
 import styles from "./index.module.scss";
@@ -43,7 +44,7 @@ const wallets: any = [
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  chain: bsc,
+  chain: bscTestnet,
   abi: contractABI
 });
 
@@ -51,7 +52,7 @@ const ZSDContract = getContract({
 const USDT = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bsc,
+  chain: bscTestnet,
   abi: contractABI,
 });
 
@@ -60,7 +61,7 @@ const USDT = getContract({
 const ZSDProjectfun = getContract({
   client: client,
   address: APIConfig.ZSDPROJECTAddress,
-  chain: bsc,
+  chain: bscTestnet,
   abi: contractZSDPROJECTABI,
 });
 
@@ -68,7 +69,7 @@ const ZSDProjectfun = getContract({
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bsc,
+  chain: bscTestnet,
 });
 
 const CallWallet = () => {
@@ -201,7 +202,6 @@ const CallWallet = () => {
         transaction: registerTX,
         account: account,
       });
-
       // 登录后授权
       // if (registerTXResult) {
       //   const balance = toWei('10000000000000000000000000');
@@ -265,7 +265,7 @@ const CallWallet = () => {
         client={client}
         wallets={wallets}
         connectModal={{ size: "compact" }}
-        chain={bsc}
+        chain={bscTestnet}
       />
       {
         <Modal
