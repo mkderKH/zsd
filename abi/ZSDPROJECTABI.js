@@ -10,6 +10,31 @@ export const ZSDPROJECTABI = [
   {
     anonymous: false,
     inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "uAmount",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "zAmount",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "yAmount",
+        type: "uint256",
+      },
+    ],
+    name: "DebugLog",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
       { indexed: true, internalType: "address", name: "user", type: "address" },
       {
         indexed: true,
@@ -88,13 +113,6 @@ export const ZSDPROJECTABI = [
     ],
     name: "refereWared",
     type: "event",
-  },
-  {
-    inputs: [],
-    name: "ONE_DAY",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
   },
   {
     inputs: [

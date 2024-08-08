@@ -14,8 +14,7 @@ import styles from "./index.module.scss";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 import { APIConfig } from "../../abi/APIConfiguration";
-// import { bsc } from "thirdweb/chains";
-import { bscTestnet } from "thirdweb/chains";
+import { bsc } from "thirdweb/chains";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
@@ -30,7 +29,7 @@ const ZSDabi: any = ZSDABI;
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: USDTAbinew,
 });
 
@@ -39,14 +38,14 @@ const ZSDSWAPContract = getContract({
   client: client,
   address: APIConfig.ZSDSwapAddress,
   abi: contractwapABI,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 const ZSD = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
   abi: ZSDabi,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 const { Option } = Select;

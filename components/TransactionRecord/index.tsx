@@ -11,8 +11,7 @@ import axios from "axios";
 const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 import { APIConfig } from "../../abi/APIConfiguration";
-// import { bsc } from "thirdweb/chains";
-import { bscTestnet } from "thirdweb/chains";
+import { bsc } from "thirdweb/chains";
 import { Span } from "next/dist/trace";
 
 const Commonform = () => {
@@ -67,11 +66,11 @@ const Commonform = () => {
 
   // 查询交易记录
   const TransactionRecordFun = async (addressnew: any) => {
-    const rpcRequest = getRpcClient({ client, chain: bscTestnet });
+    const rpcRequest = getRpcClient({ client, chain: bsc });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
-        `https://api.bscTestnet.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
+        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0xc60b8ea4a07531ce8a53d61415f1cadc645c0debef6c4a308a7cd7d578f4dae6` +
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       setTransactionRecord(response.data.result);

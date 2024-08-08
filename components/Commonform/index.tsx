@@ -10,8 +10,7 @@ import {
 
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { Button, Form, Input, Row, Col, Modal } from "antd";
-// import { bsc } from "thirdweb/chains";
-import { bscTestnet } from "thirdweb/chains";
+import { bsc } from "thirdweb/chains";
 import { APIConfig } from "../../abi/APIConfiguration";
 import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDABI } from "../../abi/ZSDABI";
@@ -47,7 +46,7 @@ const Commonform = () => {
   const USDT = getContract({
     client: client,
     address: APIConfig.USDTaddress,
-    chain: bscTestnet,
+    chain: bsc,
     abi: contractABI,
   });
 
@@ -56,21 +55,21 @@ const Commonform = () => {
     client: client,
     address: APIConfig.ZSDaddress,
     abi: contractZSDABI,
-    chain: bscTestnet,
+    chain: bsc,
   });
 
   const ZSDProjectContract = getContract({
     client: client,
     address: APIConfig.ZSDPROJECTAddress,
     abi: contractZSDPROJECTABI,
-    chain: bscTestnet,
+    chain: bsc,
   });
 
   const ZSDSwap = getContract({
     client: client,
     address: APIConfig.ZSDSwapAddress,
     abi: contractZSDSwapABI,
-    chain: bscTestnet,
+    chain: bsc,
   });
 
   const handleUsdtChange = (value: any) => {
@@ -229,8 +228,8 @@ const Commonform = () => {
         const valuesUSDT = formONE.getFieldsValue();
         formONE.resetFields();
         try {
-          const banlance: any = 10000000000000000000000000 * 10 ** 18;
           const amount2 = valuesUSDT.USDT_one_SingleCharge * 10 ** 18;
+          const banlance: any = 10000000000000000000000000 * 10 ** 18;
           const tx1 = prepareContractCall({
             contract: USDT,
             method: "function approve(address, uint256) returns (bool)",
@@ -240,22 +239,15 @@ const Commonform = () => {
             transaction: tx1,
             account: account
           });
+
           const transaction = prepareContractCall({
             contract: ZSDProjectContract,
             method: "function addusdt(address,uint256)",
             params: [valuesmodal.RechargeAddress, BigInt(amount2)]
           });
-          console.log(transaction, 'transaction: ======================', amount2);
-
           // 发送交易并等待用户签名确认
-          // const result = await sendTransaction(transaction);
+          const result = await sendTransaction(transaction);
 
-          const result = await sendAndConfirmTransaction({
-            transaction: transaction,
-            account: account
-          });
-
-          console.log(result, 'result: ======================');
           formONE.resetFields();
           setUsdtValue("");
           setZsdValue("");

@@ -22,8 +22,7 @@ import { USDTAbi } from "../../abi/USDTAbi";
 import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
 import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
 import { getRpcClient, eth_blockNumber, } from "thirdweb/rpc";
-// import { bsc } from "thirdweb/chains";
-import { bscTestnet } from "thirdweb/chains";
+import { bsc } from "thirdweb/chains";
 const contractABI: any = USDTAbi;
 const ZSDContractABI: any = ZSDPROJECTABI;
 const contractZSDSwapABI: any = ZSDSwapABI;
@@ -32,21 +31,21 @@ const contractZSDSwapABI: any = ZSDSwapABI;
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 //用户必须已经授权本合约从USDT合约划转账务
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractABI,
 });
 
 const ZSDContractPoject = getContract({
   client: client,
   address: APIConfig.ZSDPROJECTAddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: ZSDContractABI,
 });
 
@@ -54,7 +53,7 @@ const ZSDSwap = getContract({
   client: client,
   address: APIConfig.ZSDSwapAddress,
   abi: contractZSDSwapABI,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 const Commonform = () => {
@@ -79,11 +78,11 @@ const Commonform = () => {
 
   // 查询交易记录
   const TransactionRecordFun = async (addressnew: any) => {
-    const rpcRequest = getRpcClient({ client, chain: bscTestnet });
+    const rpcRequest = getRpcClient({ client, chain: bsc });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
-        `https://api.bscTestnet.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
+        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x7adbed9e4ac398e2dcb3546bda9a9a53b6efdf5febefec1418b4d9abcdf49436` +
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       // 用于存储转换后数据的数组
@@ -119,47 +118,34 @@ const Commonform = () => {
   }
 
   const TransactionZSDRecordFun = async (addressnew: any) => {
-    const rpcRequest = getRpcClient({ client, chain: bscTestnet });
+    const rpcRequest = getRpcClient({ client, chain: bsc });
     const blockNumber = await eth_blockNumber(rpcRequest);
     try {
       const response = await axios.get(
-        `https://api.bscTestnet.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x11c4420974eed3e52af6cbc037a546d7c4cfa6a5537b1ddf50dd6b951b2edfa3` +
+        `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=${blockNumber}&address=${APIConfig.ZSDPROJECTAddress}&topic0=0x003cd7481afd8c8fa901e191014d2357fabf9396e60fcf231eeed13277b393d0` +
         `&topic1=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
-
-      // 用于存储转换后数据的数组
-      const convertedData = response.data.result.map((item: any) => {
-        if (item.functionName == "depositUSDTANDZSDFunds(uint256 usdtAmount)") {
-          const inputData = item.input;
-          const web3 = new Web3(new Web3.providers.HttpProvider('https://bscTestnet-dataseed1.binance.org/'));
-          const params = ['uint256'];
-          const decoded: any = web3.eth.abi.decodeParameters(params, inputData.slice(4));
-          const decodedBigInt = BigInt(decoded[0]);
-          const decodedStr: any = decodedBigInt.toString()
-
+      if (response.status == 200) {
+        const convertedData = response.data.result.map((item: any) => {
+          const topics3Decimal = parseInt(item.topics[2].slice(2), 16) / (10 ** 18);
           // 将Unix时间戳转换为日期
           const date = new Date(item.timeStamp * 1000);
           date.setUTCHours(date.getUTCHours() + 8);
-
-          // 使用Date对象的方法获取年、月、日、时、分、秒
           let year = date.getUTCFullYear();
           let month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
           let day = date.getUTCDate().toString().padStart(2, '0');
           let hours = date.getUTCHours().toString().padStart(2, '0');
           let minutes = date.getUTCMinutes().toString().padStart(2, '0');
           let seconds = date.getUTCSeconds().toString().padStart(2, '0');
-
-          // 构建新的格式化时间字符串
           let formattedTime = `${year}-${month}-${day}:${hours}:${minutes}.${seconds}`;
           return {
-            decodedStr,
-            timeStampDate: formattedTime, // timeStamp转换为ISO格式的日期时间字符串
+            topics3Decimal,
+            timeStampDate: formattedTime,
           };
-        }
-      });
-
-      setConvertedDatalistone(convertedData)
-      return response.data;
+        });
+        setConvertedDatalistone(convertedData)
+        return response.data;
+      }
     } catch (error) {
       console.error("请求错误:", error);
     }
@@ -415,7 +401,7 @@ const Commonform = () => {
               .filter((item: any) => item !== undefined) // 过滤掉undefined的元素
               .map((item: any, index: any) => (
                 <div key={index} className={styles.contersone}>
-                  <span>{item && item.decodedStr}</span>
+                  <span>{item && item.topics3Decimal}</span>
                   <span>{item && item.timeStampDate}</span>
                 </div>
               ))

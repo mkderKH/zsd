@@ -3,8 +3,7 @@ import React, { useState, useEffect } from "react";
 import { message, Modal, Input, Form, Button, Row, Col } from "antd";
 import { createWallet, walletConnect } from "thirdweb/wallets";
 import { ConnectButton } from "thirdweb/react";
-// import { bscTestnet } from "thirdweb/chains";
-import { bscTestnet } from "thirdweb/chains";
+import { bsc } from "thirdweb/chains";
 import { client } from "../../src/app/client";
 import type { Metadata } from "next";
 import styles from "./index.module.scss";
@@ -44,7 +43,7 @@ const wallets: any = [
 const ZSDContract = getContract({
   client: client,
   address: APIConfig.ZSDaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractABI
 });
 
@@ -52,7 +51,7 @@ const ZSDContract = getContract({
 const USDT = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractABI,
 });
 
@@ -61,7 +60,7 @@ const USDT = getContract({
 const ZSDProjectfun = getContract({
   client: client,
   address: APIConfig.ZSDPROJECTAddress,
-  chain: bscTestnet,
+  chain: bsc,
   abi: contractZSDPROJECTABI,
 });
 
@@ -69,7 +68,7 @@ const ZSDProjectfun = getContract({
 const USDTContract = getContract({
   client: client,
   address: APIConfig.USDTaddress,
-  chain: bscTestnet,
+  chain: bsc,
 });
 
 const CallWallet = () => {
@@ -239,7 +238,7 @@ const CallWallet = () => {
         switch (match[1]) {
           case "referrer has not deposited":
             message.info("邀请人没有入金");
-            handleCancel();
+            // handleCancel();
             break;
           case "User already registered":
             break;
@@ -265,7 +264,7 @@ const CallWallet = () => {
         client={client}
         wallets={wallets}
         connectModal={{ size: "compact" }}
-        chain={bscTestnet}
+        chain={bsc}
       />
       {
         <Modal
