@@ -6,8 +6,9 @@ import {
   prepareContractCall,
   readContract,
   sendAndConfirmTransaction,
+  toWei
 } from "thirdweb";
-
+import { approve, allowance } from "thirdweb/extensions/erc20";
 import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { Button, Form, Input, Row, Col, Modal } from "antd";
 import { bsc } from "thirdweb/chains";
@@ -147,17 +148,29 @@ const Commonform = () => {
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
     try {
-      const banlance: any = 10000000000000000000000000 * 10 ** 18;
+      //const banlance: any = 10000000000000000000000000 * 10 ** 18;
       const amount2 = amount * 10 ** 18;
-      const tx1 = prepareContractCall({
+
+      const balance = toWei(10000000000000000000000000+'');
+      
+      const allowanceAmount = await allowance({
         contract: USDT,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDPROJECTAddress, banlance],
-      });
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account
-      });
+        spender: APIConfig.ZSDPROJECTAddress,
+        owner: account.address,
+      })
+
+      if (allowanceAmount < balance) {
+        const tx1 = prepareContractCall({
+          contract: USDT,
+          method: "function approve(address, uint256) returns (bool)",
+          params: [APIConfig.ZSDPROJECTAddress, balance],
+        });
+        const tx1Result = await sendAndConfirmTransaction({
+          transaction: tx1,
+          account: account
+        });
+      }
+      
       const transaction = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTFunds(uint256)",

@@ -1,11 +1,4 @@
 export const APIConfig = {
-  // 测试网
-  // USDTaddress: "0xEd650C5D7a5Dc96988Bcc0bD8215807aBb773DB7",
-  // ZSDaddress: "0xcfdd4192cc4568f033bd662375b02d0666766e1b",
-  // ZSDSwapAddress: "0x82c6ec706fe958eee5aa47d7958c13347b6501c7",
-  // ZSDPROJECTAddress: "0x72531fd4deb172162a4c04855b91912f2e3ea817",
-
-  // 正式网
   USDTaddress: "0x55d398326f99059fF775485246999027B3197955",
   ZSDaddress: "0x09a6fb42e73e5a6926c5d3d6e9ae01f2fce9c6b7",
   ZSDSwapAddress: "0x51E671279c38a960c43ed4591b2de03BCc84F37c",

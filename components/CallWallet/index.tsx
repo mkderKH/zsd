@@ -201,36 +201,6 @@ const CallWallet = () => {
         transaction: registerTX,
         account: account,
       });
-      // 登录后授权
-      // if (registerTXResult) {
-      //   const balance = toWei('10000000000000000000000000');
-      //   const allowanceAmount = await allowance({
-      //     contract: USDT,
-      //     spender: APIConfig.ZSDPROJECTAddress,
-      //     owner: account.address,
-      //   })
-
-      //   if (toWei(allowanceAmount + '') < balance) {
-      //     const transaction = await approve({
-      //       contract: USDTContract,
-      //       spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
-      //       amount: balance.toString(),
-      //     })
-
-      //     const hash = await sendTransaction({ transaction, account });
-
-      //     if (hash.transactionHash) {
-      //       const tx = await approve({
-      //         contract: ZSDContract,
-      //         spender: "0x8410f21f3a71a9fdae847e2e5baf714ebb6491f9",
-      //         amount: balance.toString(),
-      //       })
-      //       // const hash = await sendTransaction({ tx, account });
-      //     }
-
-      //   }
-      //   return;
-      // }
     } catch (error: any) {
       const firstLine = error.toString().split("\n")[0];
       const match = firstLine.match(/TransactionError: Error - (.+)/);
