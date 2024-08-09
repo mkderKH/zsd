@@ -6,11 +6,14 @@ const TopMenu = dynamic(() => import("../../../components/TopMenu"), {
 import IndividualCenter from "../../../components/IndividualCenter";
 import TransactionRecord from "../../../components/TransactionRecord";
 import { MenuProvider } from "../../../components/MenuContext";
+import MyTeam from "../../../components/MyTeam";
+
 const Personal = () => {
   return (
     <MenuProvider>
       <TopMenu />
       <IndividualCenter />
+      <MyTeam />
       <TransactionRecord />
     </MenuProvider>
   );

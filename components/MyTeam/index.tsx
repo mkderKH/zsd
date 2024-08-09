@@ -12,10 +12,8 @@ const THIRDWEB_PROJECT_ID: any = process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID;
 export const client = createThirdwebClient({ clientId: THIRDWEB_PROJECT_ID });
 import { APIConfig } from "../../abi/APIConfiguration";
 import { bsc } from "thirdweb/chains";
-import { Span } from "next/dist/trace";
 
 const Commonform = () => {
-  const [switchingState, setSwitchingState] = useState<any>(1);
   const [transactionRecord, setTransactionRecord] = useState<any>([]);
   const [totalAmountone, setTotalAmountone] = useState<any>('');
   const [storageAccount, setStorageAccount] = useState<any>('');
@@ -23,13 +21,9 @@ const Commonform = () => {
 
   // 到账时间
   const TimeStampFun = (time: any) => {
-    // timeStamp 是一个十六进制的时间戳
     const timeStampHex = time;
-    // 转换十六进制为十进制
     const timeStampDecimal = parseInt(timeStampHex, 16);
-    // 将 Unix 时间戳转换为 Date 对象
     const date = new Date(timeStampDecimal * 1000);
-    // 手动构建所需的日期格式
     const formattedDate = [
       date.getFullYear(),
       ('0' + (date.getMonth() + 1)).slice(-2),
@@ -39,28 +33,21 @@ const Commonform = () => {
         ('0' + date.getHours()).slice(-2),
         ('0' + date.getMinutes()).slice(-2)
       ].join(':');
-    return formattedDate; // 返回所需的日期格式
+    return formattedDate;
   };
 
   // 到账金额
   const AmountReceivedFun = (hex: string) => {
-    // 去除 '0x' 前缀
     const amountInWeiHex = hex.slice(2);
-    // 十六进制转十进制
     const amountInWei = parseInt(amountInWeiHex, 16);
-    // 转换为以太币 (1 ether = 10^18 wei)
     const amountInEther = amountInWei / Math.pow(10, 18);
-    // 返回转换后的金额，以便在 JSX 中使用
-    return amountInEther.toFixed(2); // 使用 toFixed 来格式化小数点后两位
+    return amountInEther.toFixed(2);
   }
 
   // 账号
   const ToaccountFun = (hex: string) => {
-    // 获取后八位
     let lastEightChars = hex.slice(-8);
-    // 构建前面的三个星号
     let maskedPart = '***';
-    // 合并并返回遮蔽后的字符串
     return maskedPart + lastEightChars;
   };
 
@@ -74,13 +61,10 @@ const Commonform = () => {
         `&topic2=0x000000000000000000000000${addressnew.substring(2).replace(/\s+/g, '')}&apikey=GG84IKHVXXQUE9JQMAT6N6UXAFHNFBCDM3`
       );
       setTransactionRecord(response.data.result);
-      let totalAmount = 0; // 定义一个变量来存储总金额
-      // 总金额计算
+      let totalAmount = 0;
       response.data.result.forEach((item: any) => {
-        // 将topics[3]的十六进制转换为十进制数值
         const amountInWeiHex = item.topics[3].slice(2);
         const amountInWei = parseInt(amountInWeiHex, 16);
-        // 累加到totalAmount
         totalAmount += amountInWei;
       });
       setTotalAmountone(totalAmount / 10 ** 18)
@@ -100,37 +84,31 @@ const Commonform = () => {
 
   return (
     <div className={styles.Content}>
-      <span className={styles.ContentText}>交易记录</span>
-      {/* 直推 */}
-      {
-        switchingState == '1' &&
-        <div>
-          <div className={styles.ComputingPower}>
-            <span className={styles.Contentlabel}>总金额/USDT：{totalAmountone}USDT</span>
-          </div>
-          <div className={styles.ComputingPower}>
-            <span className={styles.AmountReceived}>账号</span>
-            <span className={styles.AmountReceived}>到账金额/USDT</span>
-            <span className={styles.ArrivalTime}>到账时间</span>
-          </div>
+      <span className={styles.ContentText}>我的团队</span>
 
-          <div className={styles.CustomerInformation}>
-            {transactionRecord.length > 0 ? (
-              transactionRecord.map((item: any, index: any) => (
-                <div key={index} className={styles.ComputingPowercont}>
-                  <span className={styles.AmountReceived}>{ToaccountFun(item.topics[2])}</span>
-                  <span className={styles.AmountReceived}>{AmountReceivedFun(item.topics[3])}</span>
-                  <span className={styles.ArrivalTime}>{TimeStampFun(item.timeStamp)}</span>
-                </div>
-              ))
-            ) : (
-              <Empty description={
-                <span style={{ color: '#FFFFFF' }}>暂无数据</span>
-              } />
-            )}
-          </div>
+      <div>
+        <div className={styles.ComputingPower}>
+          <span className={styles.AmountReceived}>钱包地址</span>
+          <span className={styles.AmountReceived}>直推人数</span>
+          <span className={styles.ArrivalTime}>直推算力</span>
         </div>
-      }
+
+        <div className={styles.CustomerInformation}>
+          {transactionRecord.length > 0 ? (
+            transactionRecord.map((item: any, index: any) => (
+              <div key={index} className={styles.ComputingPowercont}>
+                <span className={styles.AmountReceived}>{ToaccountFun(item.topics[2])}</span>
+                <span className={styles.AmountReceived}>{AmountReceivedFun(item.topics[3])}</span>
+                <span className={styles.ArrivalTime}>{TimeStampFun(item.timeStamp)}</span>
+              </div>
+            ))
+          ) : (
+            <Empty description={
+              <span style={{ color: '#FFFFFF' }}>暂无数据</span>
+            } />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

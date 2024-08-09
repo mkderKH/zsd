@@ -1,0 +1,84 @@
+.Content {
+  width: 90%;
+  font-size: 14px;
+  backdrop-filter: blur(7px);
+  border-radius: 15px;
+  background: rgba(224, 224, 224, 0.19);
+  margin: 0 auto;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 20px;
+
+  .ContentText {
+    text-align: center;
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+    line-height: 28px;
+    text-align: center;
+    font-style: normal;
+    border-bottom: 3px solid #e89e2c;
+  }
+  .Tabsstyle {
+    text-align: left;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    text-align: left;
+    font-style: normal;
+    margin-bottom: 8px;
+  }
+  .teamstyle {
+    margin: 0 16px;
+  }
+  .ComputingPower {
+    width: 100%;
+    display: flex; /* 使用flex布局 */
+    justify-content: space-between; /* 使子元素两端对齐 */
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+  .Contentlabel {
+    font-weight: 400;
+    font-size: 16px;
+    color: #e89e2c;
+    line-height: 17px;
+    text-align: left;
+    font-style: normal;
+  }
+  .power {
+    font-weight: 400;
+    font-size: 12px;
+    color: #999999;
+    line-height: 17px;
+    text-align: right;
+    font-style: normal;
+  }
+  .AmountReceived {
+    font-weight: 400;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+    text-align: left;
+    font-style: normal;
+  }
+  .ArrivalTime {
+    font-weight: 400;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+    text-align: left;
+    font-style: normal;
+  }
+  .ComputingPowercont {
+    width: 100%;
+    display: flex; /* 使用flex布局 */
+    justify-content: space-between; /* 使子元素两端对齐 */
+    margin-top: 12px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid #494956;
+  }
+}

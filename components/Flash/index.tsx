@@ -76,8 +76,6 @@ const Commonform = () => {
         params: [BigInt(1000000000000000000)],
       });
       const WeiBalance = USDtoZSDnum.toString();
-
-      console.log(WeiBalance, '=====================');
       SetPrice(WeiBalance)
     } catch (error) {
       console.error("查询失败:", error);
@@ -104,30 +102,7 @@ const Commonform = () => {
         return
       }
 
-      const banlance: any = 10000000000000000000000000 * 10 ** 18
       const amountStr = values.USDT_one_amount * 10 ** 18;
-
-      // 第一次授权
-      const tx1 = prepareContractCall({
-        contract: USDTContract,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDSwapAddress, banlance],
-      });
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account
-      });
-
-      // 第二次授权
-      const tx2 = prepareContractCall({
-        contract: ZSD,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDSwapAddress, banlance],
-      });
-      const tx1Result1 = await sendAndConfirmTransaction({
-        transaction: tx2,
-        account: account
-      });
 
       // 发送交易并等待用户签名确认
       const tx3 = prepareContractCall({
@@ -139,8 +114,15 @@ const Commonform = () => {
         transaction: tx3,
         account: account
       });
+      form.setFieldsValue({
+        USDT_one_amount: '',
+        ZSD_two_amount: '',
+      });
     } catch (error) {
-      console.error("未能成功兑换USDT:", error);
+      form.setFieldsValue({
+        USDT_one_amount: '',
+        ZSD_two_amount: '',
+      });
     }
   };
 
@@ -185,10 +167,6 @@ const Commonform = () => {
                 label={<span className={styles.Contentlabel}>代币兑换</span>}
                 colon={false}
                 name="USDT_one_amount"
-                // rules={[
-                //   { required: true, message: "请输入充入金额!" },
-                //   { validator: amountValidator },
-                // ]}
               >
                 <Input
                   addonAfter={selectAfterone}

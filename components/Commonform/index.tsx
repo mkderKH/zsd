@@ -148,34 +148,14 @@ const Commonform = () => {
   // 充值USDT
   const depositUSDTFunds = async (amount: any) => {
     try {
-      //const banlance: any = 10000000000000000000000000 * 10 ** 18;
+      // debugger;
       const amount2 = amount * 10 ** 18;
-
-      const balance = toWei(10000000000000000000000000+'');
-      
-      const allowanceAmount = await allowance({
-        contract: USDT,
-        spender: APIConfig.ZSDPROJECTAddress,
-        owner: account.address,
-      })
-
-      if (allowanceAmount < balance) {
-        const tx1 = prepareContractCall({
-          contract: USDT,
-          method: "function approve(address, uint256) returns (bool)",
-          params: [APIConfig.ZSDPROJECTAddress, balance],
-        });
-        const tx1Result = await sendAndConfirmTransaction({
-          transaction: tx1,
-          account: account
-        });
-      }
-      
       const transaction = prepareContractCall({
         contract: ZSDProjectContract,
         method: "function depositUSDTFunds(uint256)",
         params: [BigInt(amount2)]
       });
+      // debugger;
       // 发送交易并等待用户签名确认
       const result = await sendTransaction(transaction);
       formONE.resetFields();
@@ -191,28 +171,7 @@ const Commonform = () => {
   // 充值ZSD
   const depositZSDFunds = async (amount: any) => {
     try {
-      const banlance: any = 10000000000000000000000000 * 10 ** 18
       const amountStr: any = amount * 10 ** 18;
-      // 第一次授权
-      const tx1 = prepareContractCall({
-        contract: USDT,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDPROJECTAddress, banlance],
-      });
-      const tx1Result = await sendAndConfirmTransaction({
-        transaction: tx1,
-        account: account
-      });
-      // 第二次授权
-      const tx2 = prepareContractCall({
-        contract: ZSD,
-        method: "function approve(address, uint256) returns (bool)",
-        params: [APIConfig.ZSDPROJECTAddress, banlance],
-      });
-      const tx1Result1 = await sendAndConfirmTransaction({
-        transaction: tx2,
-        account: account
-      });
       // 发送交易并等待用户签名确认
       const tx3 = prepareContractCall({
         contract: ZSDProjectContract,
@@ -235,92 +194,30 @@ const Commonform = () => {
 
   // 充值地址
   const onFriendRechargeFun = async () => {
+    const valuesmodal = formModal.getFieldsValue();
+    const valuesZSD = form.getFieldsValue();
+    form.resetFields();
     try {
-      if (!isButtonDisabled) {
-        const valuesmodal = formModal.getFieldsValue();
-        const valuesUSDT = formONE.getFieldsValue();
-        formONE.resetFields();
-        try {
-          const amount2 = valuesUSDT.USDT_one_SingleCharge * 10 ** 18;
-          const banlance: any = 10000000000000000000000000 * 10 ** 18;
-          const tx1 = prepareContractCall({
-            contract: USDT,
-            method: "function approve(address, uint256) returns (bool)",
-            params: [APIConfig.ZSDPROJECTAddress, banlance],
-          });
-          const tx1Result = await sendAndConfirmTransaction({
-            transaction: tx1,
-            account: account
-          });
+      const amountStr = valuesZSD.usdtInput * 10 ** 18;
+      const tx3 = prepareContractCall({
+        contract: ZSDProjectContract,
+        method: "function addusdt(address,uint256)",
+        params: [valuesmodal.RechargeAddress, BigInt(amountStr)]
+      });
+      const result = await sendAndConfirmTransaction({
+        transaction: tx3,
+        account: account
+      });
+      form.resetFields();
+      setUsdtValue("");
+      setZsdValue("");
+      setToken("");
+      setIsButtonDisabledZSD(true);
 
-          const transaction = prepareContractCall({
-            contract: ZSDProjectContract,
-            method: "function addusdt(address,uint256)",
-            params: [valuesmodal.RechargeAddress, BigInt(amount2)]
-          });
-          // 发送交易并等待用户签名确认
-          const result = await sendTransaction(transaction);
-
-          formONE.resetFields();
-          setUsdtValue("");
-          setZsdValue("");
-          setToken("");
-          setIsButtonDisabled(true);
-        } catch (error) {
-          console.error("充值交易失败:", error);
-        }
-      } else if (!isButtonDisabledZSD) {
-        const valuesmodal = formModal.getFieldsValue();
-        const valuesZSD = form.getFieldsValue();
-        form.resetFields();
-        try {
-          const banlance: any = 10000000000000000000000000 * 10 ** 18
-          const amountStr = valuesZSD.usdtInput * 10 ** 18;
-
-          // 第一次授权
-          const tx1 = prepareContractCall({
-            contract: USDT,
-            method: "function approve(address, uint256) returns (bool)",
-            params: [APIConfig.ZSDPROJECTAddress, banlance],
-          });
-          const tx1Result = await sendAndConfirmTransaction({
-            transaction: tx1,
-            account: account
-          });
-          // 第二次授权
-          const tx2 = prepareContractCall({
-            contract: ZSD,
-            method: "function approve(address, uint256) returns (bool)",
-            params: [APIConfig.ZSDPROJECTAddress, banlance],
-          });
-          const tx1Result1 = await sendAndConfirmTransaction({
-            transaction: tx2,
-            account: account
-          });
-
-          // 发送交易并等待用户签名确认
-          const tx3 = prepareContractCall({
-            contract: ZSDProjectContract,
-            method: "function addusdt(address,uint256)",
-            params: [valuesmodal.RechargeAddress, BigInt(amountStr)]
-          });
-          const result = await sendAndConfirmTransaction({
-            transaction: tx3,
-            account: account
-          });
-          form.resetFields();
-          setUsdtValue("");
-          setZsdValue("");
-          setToken("");
-          setIsButtonDisabledZSD(true);
-        } catch (error) {
-          console.error("充值交易失败:", error);
-        }
-      }
       setIsModalOpen(false); // 关闭模态框
       formModal.resetFields(); // 重置表单字段
     } catch (error) {
-      console.error("获取表单值时发生错误:", error);
+      console.error("充值交易失败:", error);
     }
   };
 
@@ -413,7 +310,6 @@ const Commonform = () => {
               <Form.Item
                 colon={false}
                 name="ComputingPower_USDT"
-              // label="算力"
               >
                 <Input
                   placeholder="请输入充入算力"
@@ -435,21 +331,6 @@ const Commonform = () => {
                   className={styles.buttonstyle}
                 >
                   充值
-                </Button>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Form.Item>
-                <Button
-                  className={styles.buttonHelpFriendstyle}
-                  onClick={() => {
-                    setIsModalOpen(true);
-                  }}
-                  disabled={isButtonDisabled}
-                >
-                  帮好友充值
                 </Button>
               </Form.Item>
             </Col>

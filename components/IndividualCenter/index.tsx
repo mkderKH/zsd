@@ -359,16 +359,6 @@ const Commonform = () => {
         </Form>
       </div>
 
-      <div className={styles.Content}>
-        <span className={styles.ContentText}>我的团队</span>
-        <div className={styles.currencycontainer}>
-          <div className={styles.currencyrow}>
-            <div className={styles.NumberPeoplestyle}>{directNumberPeople}</div>
-            <div className={styles.NumberPeople}>直推人数</div>
-          </div>
-        </div>
-      </div>
-
       <Modal
         title=""
         open={isModalOpen}
